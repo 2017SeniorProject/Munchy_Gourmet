@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<body>	
+<p>
+	Restaurant Recommendation in {{month}} in {{division}}
+</p>
+<p>  
+	{% for row in recommendation %}
+	<br>	{{ row['reco']['shopName'] }} : 
+			add:{{row['reco']['SDAddress'] }}, 
+			lon:{{ row['reco']['longitude'] }}, 
+			lat:{{ row['reco']['latitude'] }}, 
+			SDRate:{{ row['reco']['SDRate']}} ,
+			price:{{ row['reco']['price'] }}
+	</br>
+	{% endfor %}
+</p>
+	
+</body>
+</html>

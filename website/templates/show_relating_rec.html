@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<body>	
+<p>
+	Restaurant Recommendation with Restaurant Relating to Your Search: Area({{division }}), Category({{ category}})
+</p>
+<p>  
+	{% for row in recommendation %}
+	<br>	{{ row['reco']['shopName'] }} : 
+			add:{{row['reco']['SDAddress'] }}, 
+			lon:{{ row['reco']['longitude'] }}, 
+			lat:{{ row['reco']['latitude'] }}, 
+			SDRate:{{ row['reco']['SDRate']}} ,
+			price:{{ row['reco']['price'] }}
+	</br>
+	{% endfor %}
+</p>
+	
+</body>
+</html>
