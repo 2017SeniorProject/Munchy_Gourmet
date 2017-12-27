@@ -1,5 +1,5 @@
 from flask import Flask,request,session,redirect,url_for,render_template,flash
-from .models import RecoEngine
+from .models import RecoEngine, User
 
 app= Flask(__name__)
 app.secret_key = "super secret key"
@@ -8,9 +8,43 @@ app.secret_key = "super secret key"
 def index():
 	return render_template("index.html")
 	
-@app.route('/about')
-def about():
-	return "The about page"
+@app.route('/register', methods=['GET','POST'])
+def register():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        if len(username) < 1:
+            render_template("notice.html",message='Your username must be at least one character.')
+        elif len(password) < 5:
+            render_template("notice.html",message='Your password must be at least 5 characters.')
+        elif not User(username).register(password):
+            render_template("notice.html",message='A user with that username already exists.')
+        else:
+            session['username'] = username
+            return render_template("notice.html",message='Logged in.')
+
+    return render_template('register.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+
+        if not User(username).verify_password(password):
+            return render_template("notice.html",message='Invalid password')
+        else:
+            session['username'] = username
+            return render_template("notice.html",message='Logged in.')
+
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('username', None)
+    return render_template("notice.html",message='Log out.')
+    
 	
 @app.route("/near_you",methods=["GET","POST"])
 def near_you():

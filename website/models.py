@@ -6,6 +6,34 @@ import json
 #open Graph database
 graph=Graph("localhost")  #depend on your authorization choice
 
+class User:
+	def __init__(self, username):
+		self.username = username
+	
+	def find(self):
+		user = graph.find_one('User', 'username', self.username)
+		return user
+
+	def register(self, password):
+		if not self.find():
+			user = Node('User', username=self.username, password=password)
+			graph.create(user)
+			return True
+		else:
+			return False
+	
+	def verify_password(self, password):
+		user = self.find()
+		if user:
+			return (password==user['password'])
+		else:
+			return False
+
+	# def search_interest(self,location,category):
+	# 	user=self.find()
+		
+
+
 class RecoEngine:
 	def res_near_you(location):
 		#send url to get your current location #can use better method to get the division automatically as well
@@ -33,7 +61,7 @@ class RecoEngine:
 	def res_by_month(location,month1):
 		#input month, division, average
 		month=int(month1)
-		division="Jiaoxi Township"
+		division=location
 
 		query='''
 		match (d:Division{e_name:"Jiaoxi Township"})-[:IN_MONTH]->(m:Month{month:{month}}),

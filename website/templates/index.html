@@ -2,6 +2,15 @@
 <html>
 <h1>Munchy Gourmet</h1>
 <body>
+	{% if session.username %}
+ 	 <p>Logged in as {{ session.username }}</p>
+  	{% endif %}
+  {% if not session.username %}
+  <p> <a href="{{ url_for('register') }}">Register</a></p>
+  <p> <a href="{{ url_for('login') }}">Login</a></p>
+  {% else %}
+  <p> <a href="{{ url_for('logout') }}">Logout</a></p>
+  {% endif %}
   <p> <a href="{{ url_for('near_you') }}">Recommend Restaurant Near You </a> </p>
   <p> <a href="{{ url_for('by_month') }}">Recommend Restaurant By Month </a> </p>
   <p> <a href="{{ url_for('general_rec') }}">General Recommend Restaurant </a> </p>
