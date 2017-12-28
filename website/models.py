@@ -2,6 +2,7 @@ import py2neo
 from py2neo import Graph, Node, Relationship
 import requests
 import json
+import random
 
 #open Graph database
 graph=Graph("localhost")  #depend on your authorization choice
@@ -29,8 +30,30 @@ class User:
 		else:
 			return False
 
-	# def search_interest(self,location,category):
-	# 	user=self.find()
+	def search_interest(self,reco):
+		user=self.find()
+		list_res1=list(reco)
+		length=len(list_res1)
+
+		if length>0:
+			if length>=1 and length<=3:
+				list_res=list_res1.copy()
+			if length>3:
+				list_res=[0]*3
+				for i in range(3):
+					no=random.randint(0,length-1)
+					list_res[i]=list_res1[no]
+							
+			for i in range(len(list_res)):
+				res=graph.find_one("Restaurant","shopId",list_res[i]['reco']['shopId'])
+				relation=graph.match_one(start_node=user,rel_type='INTEREST',end_node=res,bidirectional=False)
+				if(relation==None):
+					rel = Relationship(user, 'INTEREST',res,level=1)
+					graph.create(rel)
+				else:
+					relation["level"]=relation["level"]+1
+					graph.push(relation)
+		return 1
 		
 
 
@@ -50,7 +73,7 @@ class RecoEngine:
 		   WITH reco, distance (point({latitude: reco.latitude, longitude: reco.longitude}), mapcenter) AS distance 
 		     //near you but we can just do the limit so that only shows
 		   RETURN reco, distance
-		   ORDER BY distance LIMIT 1000
+		   ORDER BY distance LIMIT 20
 		'''
 		lat=24.8229533748
 		lon=121.771853579

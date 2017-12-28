@@ -57,7 +57,6 @@ def near_you():
 @app.route("/by_month",methods=["GET","POST"])
 def by_month():
 	if request.method== "POST":
-		#return "todo"
 		location=request.form["division"]
 		month=request.form["month"]
 		recommendation=RecoEngine.res_by_month(location,month)
@@ -69,10 +68,13 @@ def general_rec():
 	if request.method=="POST":
 		location=request.form['division']
 		category=request.form["category"]
-		session['division']=location
-		session['category']=category
+
 		recommendation=RecoEngine.res_general_rec(location,category)
-		return render_template("show_general_rec.html",recommendation=recommendation,division=location,category=category)
+		#save the search interest
+		a=User(session['username']).search_interest(recommendation)
+		#have to do the engine twice coz cursor data lost,don't know other way yet
+		recommendation1=RecoEngine.res_general_rec(location,category)
+		return render_template("show_general_rec.html",recommendation=recommendation1,division=location,category=category)
 	return render_template("general_rec.html")
 
 @app.route("/show_similiar_search",methods=["GET"])
