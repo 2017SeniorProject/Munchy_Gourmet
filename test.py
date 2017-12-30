@@ -48,5 +48,18 @@ print (result)
 # a=graph.match_one(start_node=user,rel_type='INTEREST',end_node=res,bidirectional=False)
 # print(a)
 
+Recommendation General:
+
+query="""
+Match (reco:Restaurant)-[:IN_DIVISION]->(d:Division),
+	(reco)-[rel:GOOD_IN]->(m:Month),
+    (reco)-[:IN_CATEGORY]->(c:Category)
+    where 
+    d.e_name="Jiaoxi Township"
+    and rel.month_tendency=1 and
+    m.month=6 
+   and  c.SDCategory="其他小吃"
+return (reco) order by reco.SDRate limit 40
+"""
 
 

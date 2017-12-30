@@ -73,7 +73,7 @@ class RecoEngine:
 		   WITH reco, distance (point({latitude: reco.latitude, longitude: reco.longitude}), mapcenter) AS distance 
 		     //near you but we can just do the limit so that only shows
 		   RETURN reco, distance
-		   ORDER BY distance LIMIT 20
+		   ORDER BY distance LIMIT 1000
 		'''
 		lat=24.8229533748
 		lon=121.771853579
@@ -165,3 +165,48 @@ class RecoEngine:
 		return reco,totalWeight order by totalWeight desc limit 20
 		'''
 		return graph.run(query,input1=input1)
+
+	def res_general_rec1(location,category,month1):
+		#category="其他小吃"
+		#division="Jiaoxi Township"
+		#month=int(month1)
+
+		if category=="":
+			in_category=""
+		else:
+			in_category="""and c.SDCategory={category}"""
+
+		if month1=="":
+			in_month=""
+		else:
+			month=month1
+			in_month="and rel.month_tendency=1 and m.month= "+month+" "
+
+		begin="""Match (reco:Restaurant)-[:IN_DIVISION]->(d:Division),
+				(reco)-[rel:GOOD_IN]->(m:Month),
+				(reco)-[:IN_CATEGORY]->(c:Category)
+			    where d.e_name={division}"""
+		end=" return (reco) order by reco.SDRate limit 20"
+
+		query=begin+in_month+in_category+end
+		
+		# query="""
+		# 	Match (reco:Restaurant)-[:IN_DIVISION]->(d:Division),
+		# 		(reco)-[rel:GOOD_IN]->(m:Month),
+		# 	    (reco)-[:IN_CATEGORY]->(c:Category)
+		# 	    where 
+		# 	    d.e_name={division}"+
+		# 	    and rel.month_tendency=1 and
+		# 	    m.month=6
+		# 	   and  c.SDCategory="其他小吃"
+		# 	return (reco) order by reco.SDRate limit 20
+		# 	"""
+
+		# query='''
+		# match(reco:Restaurant)-[:IN_DIVISION]-(d:Division),
+		# (reco)-[:IN_CATEGORY]->(c:Category)
+		# where c.SDCategory={category} and
+		# 	d.e_name={division}
+		# return reco order by reco.SDRate desc limit 20
+		# '''
+		return graph.run(query,division=location,category=category)

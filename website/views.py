@@ -51,7 +51,7 @@ def near_you():
 	if request.method== "POST":
 		location=request.form["division"]
 		recommendation=RecoEngine.res_near_you(location)
-		return render_template("show_near_you.html",recommendation=recommendation,division=location)
+		return render_template("test_map.html",recommendation=recommendation,division=location)
 	return render_template("near_you.html")
 
 @app.route("/by_month",methods=["GET","POST"])
@@ -68,20 +68,17 @@ def general_rec():
 	if request.method=="POST":
 		location=request.form['division']
 		category=request.form["category"]
-
+		session["division"]=location
+		session["category"]=category
 		recommendation=RecoEngine.res_general_rec(location,category)
-		#save the search interest
-		a=User(session['username']).search_interest(recommendation)
-		#have to do the engine twice coz cursor data lost,don't know other way yet
-		recommendation1=RecoEngine.res_general_rec(location,category)
-		return render_template("show_general_rec.html",recommendation=recommendation1,division=location,category=category)
+		return render_template("show_general_rec.html",recommendation=recommendation,division=location,category=category)
 	return render_template("general_rec.html")
 
 @app.route("/show_similiar_search",methods=["GET"])
 def show_similiar_search():
 	location=session["division"]
 	category=session["category"]
-	recommendation=RecoEngine.res_similiar_search(location,category)
+	recommendation=RecoEngine.res_similiar_search(location, category)
 	return render_template("show_similiar_rec.html",recommendation=recommendation,division=location,category=category)
 
 @app.route("/show_relating_search",methods=["GET"])
@@ -90,3 +87,20 @@ def show_relating_search():
 	category=session["category"]
 	recommendation=RecoEngine.res_relating_search(location,category)
 	return render_template("show_relating_rec.html",recommendation=recommendation,division=location,category=category)
+
+@app.route("/general_rec1",methods=["GET","POST"])
+def general_rec1():
+	if request.method=="POST":
+		location=request.form['division']
+		category=request.form["category"]
+		month=request.form["month"]
+		recommendation=RecoEngine.res_general_rec1(location,category,month)
+		
+		#save the search interest
+		a=User(session['username']).search_interest(recommendation)
+		
+		#have to do the engine twice coz cursor data lost,don't know other way yet
+		recommendation1=RecoEngine.res_general_rec1(location,category,month)
+		
+		return render_template("show_general_rec.html",recommendation=recommendation1,division=location,category=category,month=month)
+	return render_template("general_rec1.html")
