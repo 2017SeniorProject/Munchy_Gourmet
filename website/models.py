@@ -2,6 +2,7 @@ import py2neo
 from py2neo import Graph, Node, Relationship
 import requests
 import json
+import random
 
 #open Graph database
 graph=Graph("localhost")  #depend on your authorization choice
@@ -29,8 +30,30 @@ class User:
 		else:
 			return False
 
-	# def search_interest(self,location,category):
-	# 	user=self.find()
+	def search_interest(self,reco):
+		user=self.find()
+		list_res1=list(reco)
+		length=len(list_res1)
+
+		if length>0:
+			if length>=1 and length<=3:
+				list_res=list_res1.copy()
+			if length>3:
+				list_res=[0]*3
+				for i in range(3):
+					no=random.randint(0,length-1)
+					list_res[i]=list_res1[no]
+							
+			for i in range(len(list_res)):
+				res=graph.find_one("Restaurant","shopId",list_res[i]['reco']['shopId'])
+				relation=graph.match_one(start_node=user,rel_type='INTEREST',end_node=res,bidirectional=False)
+				if(relation==None):
+					rel = Relationship(user, 'INTEREST',res,level=1)
+					graph.create(rel)
+				else:
+					relation["level"]=relation["level"]+1
+					graph.push(relation)
+		return 1
 		
 
 
@@ -142,3 +165,48 @@ class RecoEngine:
 		return reco,totalWeight order by totalWeight desc limit 20
 		'''
 		return graph.run(query,input1=input1)
+
+	def res_general_rec1(location,category,month1):
+		#category="其他小吃"
+		#division="Jiaoxi Township"
+		#month=int(month1)
+
+		if category=="":
+			in_category=""
+		else:
+			in_category="""and c.SDCategory={category}"""
+
+		if month1=="":
+			in_month=""
+		else:
+			month=month1
+			in_month="and rel.month_tendency=1 and m.month= "+month+" "
+
+		begin="""Match (reco:Restaurant)-[:IN_DIVISION]->(d:Division),
+				(reco)-[rel:GOOD_IN]->(m:Month),
+				(reco)-[:IN_CATEGORY]->(c:Category)
+			    where d.e_name={division}"""
+		end=" return (reco) order by reco.SDRate limit 20"
+
+		query=begin+in_month+in_category+end
+		
+		# query="""
+		# 	Match (reco:Restaurant)-[:IN_DIVISION]->(d:Division),
+		# 		(reco)-[rel:GOOD_IN]->(m:Month),
+		# 	    (reco)-[:IN_CATEGORY]->(c:Category)
+		# 	    where 
+		# 	    d.e_name={division}"+
+		# 	    and rel.month_tendency=1 and
+		# 	    m.month=6
+		# 	   and  c.SDCategory="其他小吃"
+		# 	return (reco) order by reco.SDRate limit 20
+		# 	"""
+
+		# query='''
+		# match(reco:Restaurant)-[:IN_DIVISION]-(d:Division),
+		# (reco)-[:IN_CATEGORY]->(c:Category)
+		# where c.SDCategory={category} and
+		# 	d.e_name={division}
+		# return reco order by reco.SDRate desc limit 20
+		# '''
+		return graph.run(query,division=location,category=category)
