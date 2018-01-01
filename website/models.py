@@ -190,23 +190,38 @@ class RecoEngine:
 
 		query=begin+in_month+in_category+end
 		
-		# query="""
-		# 	Match (reco:Restaurant)-[:IN_DIVISION]->(d:Division),
-		# 		(reco)-[rel:GOOD_IN]->(m:Month),
-		# 	    (reco)-[:IN_CATEGORY]->(c:Category)
-		# 	    where 
-		# 	    d.e_name={division}"+
-		# 	    and rel.month_tendency=1 and
-		# 	    m.month=6
-		# 	   and  c.SDCategory="其他小吃"
-		# 	return (reco) order by reco.SDRate limit 20
-		# 	"""
-
-		# query='''
-		# match(reco:Restaurant)-[:IN_DIVISION]-(d:Division),
-		# (reco)-[:IN_CATEGORY]->(c:Category)
-		# where c.SDCategory={category} and
-		# 	d.e_name={division}
-		# return reco order by reco.SDRate desc limit 20
-		# '''
 		return graph.run(query,division=location,category=category)
+
+	def res_similiar_search1(user1):
+
+		user=user1.find()
+		username=user['username']		
+		query="""
+		match p=(u:User)-[rel:INTEREST]->(res:Restaurant) 
+		where u.username={username}
+		with u, rel, res order by rel.level desc limit 3
+		with  collect(res) as interests
+		unwind interests as interest
+		match (interest)-[:IN_CATEGORY]->(cat:Category),
+		(cat)<-[:IN_CATEGORY]-(reco:Restaurant)
+		where not reco in interests
+		return distinct reco limit 20
+
+		"""
+		return graph.run(query,username=username)
+
+	def res_relating_search1(user1):
+
+		user=user1.find()
+		username=user['username']		
+		query="""
+		match p=(u:User)-[rel:INTEREST]->(res:Restaurant) 
+		where u.username={username}
+		with u, rel, res order by rel.level desc limit 3
+		with  collect(res) as interests
+		unwind interests as interest
+		match (interest)-[:NEIGHBOR*1..5]->(reco:Restaurant) where not reco in interests
+		return distinct reco
+
+		"""
+		return graph.run(query,username=username)
