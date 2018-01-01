@@ -195,7 +195,7 @@ class RecoEngine:
 	def res_similiar_search1(user1):
 
 		user=user1.find()
-		username=user['username']		
+		username=user['username']
 		query="""
 		match p=(u:User)-[rel:INTEREST]->(res:Restaurant) 
 		where u.username={username}
@@ -225,3 +225,38 @@ class RecoEngine:
 
 		"""
 		return graph.run(query,username=username)
+
+	def top_places1(division):
+
+		query="""
+		match (reco:Restaurant)<-[rel:TOP_PLACE]-(d:Division)
+			where d.e_name={location}
+			with reco,rel.top_place as top_place
+			return reco order by top_place desc
+		"""
+		return graph.run(query,location=division)
+
+	def res_relating_search2(user1):
+
+		user=user1.find()
+		username=user['username']	
+			
+		query1="""
+		match p=(u:User)-[rel:INTEREST]->(res:Restaurant) 
+		where u.username={username}
+		"""
+
+		query="""
+		match p=(u:User)-[rel:INTEREST]->(res:Restaurant) 
+		where u.username={username}
+		with u, rel, res order by rel.level desc limit 3
+		with  collect(res) as interests
+		unwind interests as interest
+		match (interest)-[:NEIGHBOR*1..5]->(reco:Restaurant) where not reco in interests
+		return distinct reco
+
+		"""
+		return graph.run(query,username=username)
+
+
+
