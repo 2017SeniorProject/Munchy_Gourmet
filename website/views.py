@@ -88,6 +88,8 @@ def show_relating_search():
 	recommendation=RecoEngine.res_relating_search(location,category)
 	return render_template("show_relating_rec.html",recommendation=recommendation,division=location,category=category)
 
+#new stuuff herere........
+#new stufff hererewqwq..........
 @app.route("/general_rec1",methods=["GET","POST"])
 def general_rec1():
 	if request.method=="POST":
@@ -104,3 +106,15 @@ def general_rec1():
 		
 		return render_template("show_general_rec.html",recommendation=recommendation1,division=location,category=category,month=month)
 	return render_template("general_rec1.html")
+
+@app.route("/show_similiar_search1",methods=["GET"])
+def show_similiar_search1():
+	recommendation=RecoEngine.res_similiar_search1(User(session['username']))
+	return render_template("show_similiar_rec.html",recommendation=recommendation)
+
+
+@app.route("/show_relating_search1",methods=["GET"])
+def show_relating_search1():
+	recommendation=RecoEngine.res_relating_search1(User(session['username']))
+	return render_template("show_relating_rec.html",recommendation=recommendation)
+
