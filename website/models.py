@@ -6,7 +6,7 @@ import json
 import random
 
 #open Graph database
-graph=Graph("localhost")  #depend on your authorization choice
+graph=Graph("http://neo4j:403840308@localhost:7474")  #depend on your authorization choice
 
 class User:
 	def __init__(self, username):
