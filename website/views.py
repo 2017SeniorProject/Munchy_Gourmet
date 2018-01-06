@@ -22,7 +22,8 @@ def register():
             render_template("notice.html",message='A user with that username already exists.')
         else:
             session['username'] = username
-            return render_template("notice.html",message='Logged in.')
+            User(session['username']).setLocation()
+            return render_template("notice.html",message='register sucessfully')
 
     return render_template('register.html')
 
@@ -36,6 +37,7 @@ def login():
             return render_template("notice.html",message='Invalid password')
         else:
             session['username'] = username
+            User(session['username']).setLocation()
             return render_template("notice.html",message='Logged in.')
 
     return render_template('login.html')
@@ -118,3 +120,33 @@ def show_relating_search1():
 	recommendation=RecoEngine.res_relating_search1(User(session['username']))
 	return render_template("show_relating_rec.html",recommendation=recommendation)
 
+#################updated after report##################################################################
+@app.route("/by_this_month",methods=["GET","POST"])
+def by_this_month():
+	if request.method== "POST":
+		location=request.form["division"]
+		category=request.form["category"]
+		user=User(session['username'])
+
+		recommendation=RecoEngine.res_this_month(location,category,user)
+		return render_template("show_by_month.html",recommendation=recommendation,division=location)
+	return render_template("by_this_month.html")
+
+
+@app.route("/more",methods=["GET","POST"])
+def more():
+	if request.method== "POST":
+		location=request.form["division"]
+		category=request.form["category"]
+		month=request.form["month"]
+		user=User(session['username'])
+		
+		recommendation=RecoEngine.more(location,category,month,user)
+		return render_template("more.html",recommendation=recommendation)
+	return render_template("general_rec2.html")
+
+@app.route("/just_for_you",methods=["GET"])
+def just_for_you():
+	user=User(session['username'])
+	recommendation=RecoEngine.near_you2(user)
+	return render_template("just_for_you.html",near_you=recommendation)

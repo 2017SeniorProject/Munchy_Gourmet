@@ -1,5 +1,6 @@
 import py2neo
 from py2neo import Graph, Node, Relationship
+from datetime import datetime
 import requests
 import json
 import random
@@ -54,7 +55,18 @@ class User:
 					relation["level"]=relation["level"]+1
 					graph.push(relation)
 		return 1
-		
+	
+	def setLocation(self):
+		user=self.find()
+
+		send_url = 'http://freegeoip.net/json'
+		r = requests.get(send_url)
+		j = json.loads(r.text)
+
+		user["latitude"] = j['latitude']
+		user["longitude"] = j['longitude']
+
+		graph.push(user)
 
 
 class RecoEngine:
@@ -166,6 +178,7 @@ class RecoEngine:
 		'''
 		return graph.run(query,input1=input1)
 
+#####################################################################################################################
 	def res_general_rec1(location,category,month1):
 		#category="其他小吃"
 		#division="Jiaoxi Township"
@@ -226,6 +239,7 @@ class RecoEngine:
 		"""
 		return graph.run(query,username=username)
 
+#########################################################################################
 	def top_places1(division):
 
 		query="""
@@ -248,7 +262,7 @@ class RecoEngine:
 
 		query="""
 		match p=(u:User)-[rel:INTEREST]->(res:Restaurant) 
-		where u.username={username}
+		where u.username={username} 
 		with u, rel, res order by rel.level desc limit 3
 		with  collect(res) as interests
 		unwind interests as interest
@@ -257,6 +271,112 @@ class RecoEngine:
 
 		"""
 		return graph.run(query,username=username)
+###############################################################################################
+	def res_this_month(loc,cat,user1):
+		#find today month
+		now=datetime.now()
+		month=now.month
+
+		#get the user
+		user=user1.find()
+		username=user["username"]
+
+		if loc=="":
+			in_division=""
+		else:
+			in_division=" and d.e_name="+"\""+loc+"\" "
+
+		if cat=="":
+			in_category=""
+		else:
+			in_category=" and c.SDCategory="+"\""+cat+"\" "
+
+		#fit in the query
+		begin="""
+			Match (u:User) where u.username={username}
+			WITH point({latitude:u.latitude,longitude:u.longitude}) AS mapcenter
+
+			MATCH (reco:Restaurant)-[:IN_DIVISION]->(d:Division),
+				  (reco)-[rel:BY_MONTH]->(m:Month),
+				(reco)-[:IN_CATEGORY]->(c:Category) """
+		m="where m.month={month} "
+
+		end="""
+		 WITH reco, distance (point({latitude: reco.latitude, longitude: reco.longitude}), mapcenter) AS distance ,rel,c
+			RETURN distinct reco,distance,c.SDCategory as cat, rel.m_avg as month_score
+			ORDER BY month_score desc LIMIT 20
+		"""
+		query=begin+m+in_division+in_category+end
+
+		return graph.run(query,username=username,month=month)
 
 
+	def more(loc,cat,mon,user1):
+		#get the user
+		user=user1.find()
+		username=user["username"]
 
+		if loc=="":
+			in_division=""
+		else:
+			in_division=" d.e_name="+"\""+loc+"\" "
+
+		if cat=="":
+			in_category=""
+		else:
+			in_category=" and c.SDCategory="+"\""+cat+"\" "
+
+		if mon=="":
+			in_month=""
+		else:
+			in_month=" and m.month= "+mon+" "
+
+		#fit in query
+		begin="""
+			Match (u:User) where u.username={username}
+			WITH point({latitude:u.latitude,longitude:u.longitude}) AS mapcenter
+
+			MATCH (reco:Restaurant)-[:IN_DIVISION]->(d:Division),
+				  (reco)-[rel:BY_MONTH]->(m:Month),
+				(reco)-[:IN_CATEGORY]->(c:Category) where """
+		
+		if mon=="":
+			end="""
+			WITH distinct reco, distance (point({latitude: reco.latitude, longitude: reco.longitude}), mapcenter) AS distance ,rel,c
+				RETURN reco,distance
+				ORDER BY reco.SDRate desc LIMIT 20
+			"""
+		else:
+
+			end="""
+			 WITH reco, distance (point({latitude: reco.latitude, longitude: reco.longitude}), mapcenter) AS distance ,rel,c
+				RETURN reco,distance, rel.m_avg as month_score
+				ORDER BY month_score desc LIMIT 20
+			"""
+
+		query=begin+in_division+in_category+in_month+end
+
+		return graph.run(query,username=username)
+
+	def near_you2(user1):
+		user=user1.find()
+		username=user['username']
+
+		query="""
+		Match (u:User) where u.username={username}
+		WITH point({latitude:u.latitude,longitude:u.longitude}) AS mapcenter
+		MATCH (reco:Restaurant)-[:IN_DIVISION]->(d:Division)
+
+		WITH reco, distance (point({latitude: reco.latitude, longitude: reco.longitude}), mapcenter) AS distance
+		RETURN reco, distance
+		ORDER BY distance LIMIT 10
+		"""
+		return graph.run(query,username=username)
+
+
+##############################################################################################
+def timestamp():
+	epoch = datetime.utcfromtimestamp(0)
+	now = datetime.now()
+	delta = now - epoch
+	return delta.total_seconds()
