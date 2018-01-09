@@ -1,23 +1,184 @@
-<!DOCTYPE html>
-<html>
-<h1>Munchy Gourmet</h1>
-<body>
-	{% if session.username %}
- 	 <p>Logged in as {{ session.username }}</p>
-  	{% endif %}
-  {% if not session.username %}
-  <p> <a href="{{ url_for('register') }}">Register</a></p>
-  <p> <a href="{{ url_for('login') }}">Login</a></p>
-  {% else %}
-  <p> <a href="{{ url_for('logout') }}">Logout</a></p>
-  {% endif %}
-  <p> <a href="{{ url_for('near_you') }}">Recommend Restaurant Near You </a> </p>
-  <p> <a href="{{ url_for('by_month') }}">Recommend Restaurant By Month </a> </p>
-  <p> <a href="{{ url_for('general_rec1') }}">General Recommend Restaurant </a> </p>
-  <p> <a href="{{ url_for('show_similiar_search1') }}">Restaurant Similiar To Your Search</a></p>
-  <p> <a href="{{ url_for('show_relating_search1') }}">Restaurant Relating To Your Search</a></p>
-  <p> <a href="{{ url_for('by_this_month') }}">***Restaurant in this Month</a></p>
-  <p> <a href="{{ url_for('more') }}">***More </a> </p>
-  <p> <a href="{{ url_for('just_for_you') }}">***Just for you </a> </p>
-</body>
-</html>
+{% extends "layout_noborder.html" %}
+
+{% block content %}
+    {% include "head.html" %}
+
+    <!-- Page Content -->
+    <section class="py-5">
+        <div class="container">
+            <div>
+
+                <button onclick="getLocation()">Geolocation Demo</button>
+                <p id="demo"></p>
+            </div>
+        </div>
+    </section>
+
+
+    <div>
+        <form action="{{ url_for('show') }}" method="post">
+            <br>
+            Area:
+            <select name="division">
+                {% for row in division %}
+                    <option value={{ row['area'] }}>{{ row['area'] }}</option>
+                {% endfor %}
+            </select>
+
+            </br>
+            <br>
+            Category:
+            <select name="category">
+                <option value="all">all</option>
+                {% for row in category %}
+                    <option value={{ row['category'] }}>{{ row.category }}</option>
+                {% endfor %}
+            </select>
+
+            </br>
+            <br>
+            Month:
+            <select name="month">
+                <option value="all">all</option>
+                {% for row in month %}
+                    <option value={{ row['month'] }}>{{ row.month }}</option>
+                {% endfor %}
+            </select>
+
+            </br>
+            <input type="submit" value="submit">
+        </form>
+    </div>
+    {% if session.username %}
+        <div>
+            <h1> Near You </h1>
+            {% for row in nearyou %}
+                <p>
+                    name:{{ row['reco']['shopName'] }},
+                    add:{{ row['reco']['SDAddress'] }},
+                    lat:{{ row['reco']['latitude'] }},
+                    lon:{{ row['reco']['longitude'] }},
+                    SDRate:{{ row['reco'['SDRate']] }}
+                    cat:{{ row['cat'] }},
+                    distance:{{ row['distance'] }}
+                    price: {{ row['reco']['price'] }}
+                    <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
+                </p>
+            {% endfor %}
+        </div>
+    {% endif %}
+    <div>
+        <h1> This Season </h1>
+        {% for row in season %}
+            <p>
+                name:{{ row['reco']['shopName'] }},
+                add:{{ row['reco']['SDAddress'] }},
+                lat:{{ row['reco']['latitude'] }},
+                lon:{{ row['reco']['longitude'] }},
+                SDRate:{{ row['reco'['SDRate']] }}
+                cat:{{ row['cat'] }},
+                distance:{{ row['distance'] }}
+                price: {{ row['reco']['price'] }}
+                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
+            </p>
+        {% endfor %}
+
+    </div>
+
+    <div>
+        <h1>Popular Restaurant</h1>
+        {% for row in popular %}
+            <p>
+                name:{{ row['reco']['shopName'] }},
+                add:{{ row['reco']['SDAddress'] }},
+                lat:{{ row['reco']['latitude'] }},
+                lon:{{ row['reco']['longitude'] }},
+                SDRate:{{ row['reco'['SDRate']] }}
+                cat:{{ row['cat'] }},
+                distance:{{ row['distance'] }}
+                price: {{ row['reco']['price'] }}
+                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
+            </p>
+        {% endfor %}
+    </div>
+    <div>
+        <h1> Popular in Yilan City </h1>
+        {% for row in yilan %}
+            <p>
+                name:{{ row['reco']['shopName'] }},
+                add:{{ row['reco']['SDAddress'] }},
+                lat:{{ row['reco']['latitude'] }},
+                lon:{{ row['reco']['longitude'] }},
+                SDRate:{{ row['reco'['SDRate']] }}
+                cat:{{ row['cat'] }},
+                distance:{{ row['distance'] }}
+                price: {{ row['reco']['price'] }}
+                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
+            </p>
+        {% endfor %}
+    </div>
+    <div>
+        <h1> Popular in Loudong </h1>
+        {% for row in loudong %}
+            <p>
+                name:{{ row['reco']['shopName'] }},
+                add:{{ row['reco']['SDAddress'] }},
+                lat:{{ row['reco']['latitude'] }},
+                lon:{{ row['reco']['longitude'] }},
+                SDRate:{{ row['reco'['SDRate']] }}
+                cat:{{ row['cat'] }},
+                distance:{{ row['distance'] }}
+                price: {{ row['reco']['price'] }}
+                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
+            </p>
+        {% endfor %}
+    </div>
+    <div>
+        <h1> Popular in Jiaoxi </h1>
+        {% for row in jiaoxi %}
+            <p>
+                name:{{ row['reco']['shopName'] }},
+                add:{{ row['reco']['SDAddress'] }},
+                lat:{{ row['reco']['latitude'] }},
+                lon:{{ row['reco']['longitude'] }},
+                SDRate:{{ row['reco'['SDRate']] }}
+                cat:{{ row['cat'] }},
+                distance:{{ row['distance'] }}
+                price: {{ row['reco']['price'] }}
+                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
+            </p>
+        {% endfor %}
+    </div>
+    <div>
+        <h1> Popular in Toucheng </h1>
+        {% for row in toucheng %}
+            <p>
+                name:{{ row['reco']['shopName'] }},
+                add:{{ row['reco']['SDAddress'] }},
+                lat:{{ row['reco']['latitude'] }},
+                lon:{{ row['reco']['longitude'] }},
+                SDRate:{{ row['reco'['SDRate']] }}
+                cat:{{ row['cat'] }},
+                distance:{{ row['distance'] }}
+                price: {{ row['reco']['price'] }}
+                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
+            </p>
+        {% endfor %}
+    </div>
+    <div>
+        <h1> Popular in Dongshan </h1>
+        {% for row in dongshan %}
+            <p>
+                name:{{ row['reco']['shopName'] }},
+                add:{{ row['reco']['SDAddress'] }},
+                lat:{{ row['reco']['latitude'] }},
+                lon:{{ row['reco']['longitude'] }},
+                SDRate:{{ row['reco'['SDRate']] }}
+                cat:{{ row['cat'] }},
+                distance:{{ row['distance'] }}
+                price: {{ row['reco']['price'] }}
+                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
+            </p>
+        {% endfor %}
+    </div>
+{% endblock %}

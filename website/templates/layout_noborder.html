@@ -53,9 +53,15 @@
         </div>
     </div>
 </nav>
-<div class="container-fluid">{% block content %}{% endblock %}</div>
+{% block content %}{% endblock %}
 
-{% include 'footer.html' %}
+<!-- Footer -->
+<footer class="py-5 bg-dark">
+    <div class="container">
+        <p class="m-0 text-center text-white">Proudly Present by ❤ IIT MGRS 2018</p>
+    </div>
+    <!-- /.container -->
+</footer>
 
 <!--Modal--->
 <!-- The Modal -->
@@ -92,6 +98,7 @@
         </div>
     </div>
 </div>
+
 
 <script>
     var x = document.getElementById("demo");
