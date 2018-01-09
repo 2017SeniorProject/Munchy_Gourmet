@@ -1,10 +1,9 @@
-<!DOCTYPE html>
-<html>
+{% extends "layout.html" %}
 
-<body>	
-<p>
+{% block content %}
+<h1>
 	General Recommendation
-</p>
+</h1>
 
   {% for row in recommendation %}
 <p>
@@ -18,7 +17,6 @@
 
  </p> 
   {% endfor %}
-</script>
-	
-</body>
-</html>
+
+
+{% endblock %}

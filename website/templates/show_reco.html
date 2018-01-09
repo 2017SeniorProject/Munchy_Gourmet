@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<p>
+	Your Result
+</p>
+
+
+<div id="map" style="height: 500px;"></div>
+
+<script type="text/javascript">
+  // The first parameter are the coordinates of the center of the map
+  // The second parameter is the zoom level
+  var map = L.map('map').setView([40.712, -74.006], 11);
+  
+  var layer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+  });
+  
+  // Now add the layer onto the map
+  map.addLayer(layer);
+
+  // It even opens up a popup when you click it!
+  {% for row in recommendation %}
+
+	L.marker([{{ row['reco']['latitude'] }}, {{ row['reco']['longitude'] }}]).addTo(map)
+  .bindPopup("<strong>{{ row['reco']['shopName'] }}</strong>").openPopup();
+  
+  {% endfor %}
+  
+</script>
+
+<div>
+{% for row in recommendation %}
+          <p>
+          name:{{ row['reco']['shopName'] }},
+          add:{{ row['reco']['SDAddress']}},
+          lat:{{ row['reco']['latitude'] }},
+          lon:{{ row['reco']['longitude'] }},
+          SDRate:{{ row['reco'['SDRate']] }}
+          cat:{{ row['cat']}},
+          distance:{{ row['distance'] }}
+          price:{{ row['reco']['price']}}
+          <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
+           </p> 
+{% endfor %}
+</div>
+
+{% endblock %}
