@@ -1,7 +1,8 @@
-from flask import Flask, request, session, redirect, url_for, render_template, flash
-from .models import RecoEngine, User
 from flask import Flask
+from flask import request, session, render_template
 from flask_debugtoolbar import DebugToolbarExtension
+
+from .models import RecoEngine, User
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -14,6 +15,21 @@ app.config['SECRET_KEY'] = 'salt'
 
 toolbar = DebugToolbarExtension(app)
 
+
+# cache = Cache(app,config={'CACHE_TYPE': 'simple'})
+#
+# @app.context_processor
+# def override_url_for():
+#     return dict(url_for=dated_url_for)
+#
+# def dated_url_for(endpoint, **values):
+#     if endpoint == 'static':
+#         filename = values.get('landing-page.css', None)
+#         if filename:
+#             file_path = os.path.join(app.root_path,
+#                                      endpoint, filename)
+#             values['q'] = int(os.stat(file_path).st_mtime)
+#     return url_for(endpoint, **values)
 
 # @app.route('/')
 # def index():
@@ -182,28 +198,29 @@ def just_for_you():
 ######################################################################################################################################################
 @app.route("/show", methods=["GET", "POST"])
 def show():
+    rec = RecoEngine()
     if request.method == "POST":
         location = request.form["division"]
         category = request.form["category"]
         month = request.form["month"]
         user = User(session['username'])
-        recommendation = RecoEngine.more2(location, category, month, user)
+        recommendation = rec.more2(location, category, month, user)
         if len(recommendation) > 0:
             session['item'] = recommendation[0]['reco']
         # reco=RecoEngine.more2(location,category,month,user)
         return render_template("show_reco.html", recommendation=recommendation)
 
-    season = RecoEngine.currentSeason()
-    category = RecoEngine.getCategory()
-    month = RecoEngine.getMonth()
-    division = RecoEngine.getDivision()
-    topPlace = RecoEngine.topPlace()
-    jiaoxi = RecoEngine.topResJiaoxi()
-    yilan = RecoEngine.topRes("宜蘭市")
-    loudong = RecoEngine.topRes("羅東鎮")
-    toucheng = RecoEngine.topResToucheng()
-    dongshan = RecoEngine.topResDongshan()
-    nearyou = RecoEngine.res_near_you()
+    season = rec.currentSeason()
+    category = rec.getCategory()
+    month = rec.getMonth()
+    division = rec.getDivision()
+    topPlace = rec.topPlace()
+    jiaoxi = rec.topResJiaoxi()
+    yilan = rec.topRes("宜蘭市")
+    loudong = rec.topRes("羅東鎮")
+    toucheng = rec.topResToucheng()
+    dongshan = rec.topResDongshan()
+    nearyou = rec.res_near_you()
     return render_template("show.html", season=season, category=category, month=month, division=division, jiaoxi=jiaoxi,
                            popular=topPlace, yilan=yilan, loudong=loudong, toucheng=toucheng, dongshan=dongshan,
                            nearyou=nearyou)
@@ -211,6 +228,7 @@ def show():
 
 @app.route("/", methods=["GET", "POST"])
 def home():
+    rec = RecoEngine()
     if request.method == "POST":
         location = request.form["division"]
         category = request.form["category"]
@@ -222,26 +240,28 @@ def home():
         # reco=RecoEngine.more2(location,category,month,user)
         return render_template("show_reco.html", recommendation=recommendation)
 
-    season = RecoEngine.currentSeason()
-    category = RecoEngine.getCategory()
-    month = RecoEngine.getMonth()
-    division = RecoEngine.getDivision()
-    topPlace = RecoEngine.topPlace()
-    jiaoxi = RecoEngine.topResJiaoxi()
-    yilan = RecoEngine.topRes("宜蘭市")
-    loudong = RecoEngine.topRes("羅東鎮")
-    toucheng = RecoEngine.topResToucheng()
-    dongshan = RecoEngine.topResDongshan()
-    nearyou = RecoEngine.res_near_you()
-    return render_template("index.html", season=season, category=category, month=month, division=division, jiaoxi=jiaoxi,
+    season = rec.currentSeason()
+    category = rec.getCategory()
+    month = rec.getMonth()
+    division = rec.getDivision()
+    topPlace = rec.topPlace()
+    jiaoxi = rec.topResJiaoxi()
+    yilan = rec.topRes("宜蘭市")
+    loudong = rec.topRes("羅東鎮")
+    toucheng = rec.topResToucheng()
+    dongshan = rec.topResDongshan()
+    nearyou = rec.res_near_you()
+    return render_template("index.html", season=season, category=category, month=month, division=division,
+                           jiaoxi=jiaoxi,
                            popular=topPlace, yilan=yilan, loudong=loudong, toucheng=toucheng, dongshan=dongshan,
                            nearyou=nearyou)
 
 
 @app.route("/res_detail/<shopId>")
 def res_detail(shopId):
+    rec = RecoEngine()
     ###list shop detail and relating restaurant
-    detail = RecoEngine.getDetail(shopId)
-    reviews = RecoEngine.getReviews(shopId)
-    relating = RecoEngine.relating(shopId)
+    detail = rec.getDetail(shopId)
+    reviews = rec.getReviews(shopId)
+    relating = rec.relating(shopId)
     return render_template("res_detail.html", relating=relating, detail=detail, reviews=reviews)

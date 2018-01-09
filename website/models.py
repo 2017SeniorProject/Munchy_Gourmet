@@ -1,142 +1,141 @@
-import py2neo
-from py2neo import Graph, Node, Relationship
-from datetime import datetime
-import requests
 import json
 import random
+from datetime import datetime
 
-#open Graph database
-graph=Graph("http://neo4j:403840308@localhost:7474")  #depend on your authorization choice
+import requests
+from py2neo import Graph, Node, Relationship
+
+# open Graph database
+graph = Graph("localhost")  # depend on your authorization choice
+
 
 class User:
-	def __init__(self, username):
-		self.username = username
-	
-	def find(self):
-		user = graph.find_one('User', 'username', self.username)
-		return user
+    def __init__(self, username):
+        self.username = username
 
-	def register(self, password):
-		if not self.find():
-			user = Node('User', username=self.username, password=password)
-			graph.create(user)
-			return True
-		else:
-			return False
-	
-	def verify_password(self, password):
-		user = self.find()
-		if user:
-			return (password==user['password'])
-		else:
-			return False
+    def find(self):
+        user = graph.find_one('User', 'username', self.username)
+        return user
 
-	def search_interest(self,reco):
-		user=self.find()
-		list_res1=list(reco)
-		length=len(list_res1)
+    def register(self, password):
+        if not self.find():
+            user = Node('User', username=self.username, password=password)
+            graph.create(user)
+            return True
+        else:
+            return False
 
-		if length>0:
-			if length>=1 and length<=3:
-				list_res=list_res1.copy()
-			if length>3:
-				list_res=[0]*3
-				for i in range(3):
-					no=random.randint(0,length-1)
-					list_res[i]=list_res1[no]
-							
-			for i in range(len(list_res)):
-				res=graph.find_one("Restaurant","shopId",list_res[i]['reco']['shopId'])
-				relation=graph.match_one(start_node=user,rel_type='INTEREST',end_node=res,bidirectional=False)
-				if(relation==None):
-					rel = Relationship(user, 'INTEREST',res,level=1)
-					graph.create(rel)
-				else:
-					relation["level"]=relation["level"]+1
-					graph.push(relation)
-		return 1
-	
-	def setLocation(self):
-		user=self.find()
+    def verify_password(self, password):
+        user = self.find()
+        if user:
+            return (password == user['password'])
+        else:
+            return False
 
-		send_url = 'http://freegeoip.net/json'
-		r = requests.get(send_url)
-		j = json.loads(r.text)
+    def search_interest(self, reco):
+        user = self.find()
+        list_res1 = list(reco)
+        length = len(list_res1)
 
-		user["latitude"] = j['latitude']
-		user["longitude"] = j['longitude']
+        if length > 0:
+            if length >= 1 and length <= 3:
+                list_res = list_res1.copy()
+            if length > 3:
+                list_res = [0] * 3
+                for i in range(3):
+                    no = random.randint(0, length - 1)
+                    list_res[i] = list_res1[no]
 
-		graph.push(user)
+            for i in range(len(list_res)):
+                res = graph.find_one("Restaurant", "shopId", list_res[i]['reco']['shopId'])
+                relation = graph.match_one(start_node=user, rel_type='INTEREST', end_node=res, bidirectional=False)
+                if (relation == None):
+                    rel = Relationship(user, 'INTEREST', res, level=1)
+                    graph.create(rel)
+                else:
+                    relation["level"] = relation["level"] + 1
+                    graph.push(relation)
+        return 1
+
+    def setLocation(self):
+        user = self.find()
+
+        send_url = 'http://freegeoip.net/json'
+        r = requests.get(send_url)
+        j = json.loads(r.text)
+
+        user["latitude"] = j['latitude']
+        user["longitude"] = j['longitude']
+
+        graph.push(user)
 
 
 class RecoEngine:
-	def res_near_you():
-		#send url to get your current location #can use better method to get the division automatically as well
-		send_url = 'http://freegeoip.net/json'
-		r = requests.get(send_url)
-		j = json.loads(r.text)
-		lati = j['latitude']
-		longi = j['longitude']
+    def res_near_you(self):
+        # send url to get your current location #can use better method to get the division automatically as well
+        send_url = 'http://freegeoip.net/json'
+        r = requests.get(send_url)
+        j = json.loads(r.text)
+        lati = j['latitude']
+        longi = j['longitude']
 
-		#query for the match your location with the restaurant
-		query='''
+        # query for the match your location with the restaurant
+        query = '''
 		WITH point({latitude:{lat},longitude:{lon}}) AS mapcenter
 		   MATCH (reco:Restaurant)-[:IN_DIVISION]->(b:Division) 
 		   WITH reco, distance (point({latitude: reco.latitude, longitude: reco.longitude}), mapcenter) AS distance
 		   RETURN reco, distance
-		   ORDER BY distance LIMIT 5
+		   ORDER BY distance LIMIT 4
 		'''
-		lat=24.8229533748
-		lon=121.771853579
-		#sdivision=location
-		return graph.data(query,lat=lati,lon=longi)
+        lat = 24.8229533748
+        lon = 121.771853579
+        # sdivision=location
+        return graph.data(query, lat=lati, lon=longi)
 
+    def res_by_month(self, location, month1):
+        # input month, division, average
+        month = int(month1)
+        division = location
 
-	def res_by_month(location,month1):
-		#input month, division, average
-		month=int(month1)
-		division=location
-
-		query='''
+        query = '''
 		match (d:Division{e_name:"Jiaoxi Township"})-[:IN_MONTH]->(m:Month{month:{month}}),
 			(m)<-[:WRITTEN_IN]-(r:Review),
 		    (r)-[:ABOUT]->(n:Restaurant)
 		return avg(r.SDRate) as avg
 		'''
-		avg_data=graph.run(query,month=month,division=location).data()
+        avg_data = graph.run(query, month=month, division=location).data()
 
-		average=avg_data[0]['avg']
+        average = avg_data[0]['avg']
 
-		#recommendation for restaurant by month: ranking the the restaurant by their review rating: most review above average of month
-		query='''
+        # recommendation for restaurant by month: ranking the the restaurant by their review rating: most review above average of month
+        query = '''
 		match (d:Division{e_name:{division}})-[:IN_MONTH]->(m:Month{month:{month}})
 		match	(m)<-[:WRITTEN_IN]-(r:Review)
 		match   (r)-[:ABOUT]->(reco:Restaurant) where r.SDRate>{average}
 		return reco, count(r) as count order by count desc
 		'''
-		return graph.run(query,month=month,division=location,average=average)
+        return graph.run(query, month=month, division=location, average=average)
 
+    def res_general_rec(self, location, category):
+        # category="其他小吃"
+        # division="Jiaoxi Township"
 
-	def res_general_rec(location,category):
-		#category="其他小吃"
-		#division="Jiaoxi Township"
-
-		query='''
+        query = '''
 		match(reco:Restaurant)-[:IN_DIVISION]-(d:Division),
 		(reco)-[:IN_CATEGORY]->(c:Category)
 		where c.SDCategory={category} and
 			d.e_name={division}
 		return reco order by reco.SDRate desc limit 20
 		'''
-		return graph.run(query,category=category,division=location)
+        return graph.run(query, category=category, division=location)
 
-	def res_similiar_search(location1,category1):
-		#category="其他小吃"
-		#division="Jiaoxi Township"
-		category=category1
-		division=location1
+    def res_similiar_search(self, location1, category1):
+        # category="其他小吃"
+        # division="Jiaoxi Township"
+        category = category1
+        division = location1
 
-		query='''
+        query = '''
 		match(n:Restaurant)-[:IN_DIVISION]-(d:Division),
 		(n)-[:IN_CATEGORY]->(c:Category)
 		where c.SDCategory={category} and
@@ -147,68 +146,68 @@ class RecoEngine:
 			 c1 IN rec_cat
 		return reco order by reco.SDRate desc
 		'''
-		return graph.run(query,category=category,division=division)
+        return graph.run(query, category=category, division=division)
 
-	def res_relating_search(location1,category1):
-		#input month, division from users(should be saved during the user session to do the recommendation)
-		#category="其他小吃"
-		#division="Luodong Township"
-		category=category1
-		division=location1
+    def res_relating_search(self, location1, category1):
+        # input month, division from users(should be saved during the user session to do the recommendation)
+        # category="其他小吃"
+        # division="Luodong Township"
+        category = category1
+        division = location1
 
-		# get the search data
-		query='''
+        # get the search data
+        query = '''
 		match(n:Restaurant)-[:IN_DIVISION]-(d:Division),
 		(n)-[:IN_CATEGORY]->(c:Category)
 		where c.SDCategory={category} and
 			d.e_name={division}
 		return n.shopId    
 		'''
-		search=graph.run(query,category=category,division=division).data()
+        search = graph.run(query, category=category, division=division).data()
 
-		#just get the first on in the list to travel around its neighbor to get recommendation  
+        # just get the first on in the list to travel around its neighbor to get recommendation
 
-		input1=search[0]['n.shopId']
-		query='''
+        input1 = search[0]['n.shopId']
+        query = '''
 		match (n:Restaurant{shopId:{input1}}),
 		path=(n)-[r:RELATE*1..2]-(reco)
 		with reduce(common_au=0, r IN rels(path) | common_au+r.common_au) AS totalWeight,path,(n),(reco)
 		return reco,totalWeight order by totalWeight desc limit 20
 		'''
-		return graph.run(query,input1=input1)
+        return graph.run(query, input1=input1)
 
-#####################################################################################################################
-	def res_general_rec1(location,category,month1):
-		#category="其他小吃"
-		#division="Jiaoxi Township"
-		#month=int(month1)
+    #####################################################################################################################
+    def res_general_rec1(self, location, category, month1):
+        # category="其他小吃"
+        # division="Jiaoxi Township"
+        # month=int(month1)
 
-		if category=="":
-			in_category=""
-		else:
-			in_category="""and c.SDCategory={category}"""
+        if category == "":
+            in_category = ""
+        else:
+            in_category = """and c.SDCategory={category}"""
 
-		if month1=="":
-			in_month=""
-		else:
-			month=month1
-			in_month="and rel.month_tendency=1 and m.month= "+month+" "
+        if month1 == "":
+            in_month = ""
+        else:
+            month = month1
+            in_month = "and rel.month_tendency=1 and m.month= " + month + " "
 
-		begin="""Match (reco:Restaurant)-[:IN_DIVISION]->(d:Division),
+        begin = """Match (reco:Restaurant)-[:IN_DIVISION]->(d:Division),
 				(reco)-[rel:GOOD_IN]->(m:Month),
 				(reco)-[:IN_CATEGORY]->(c:Category)
 			    where d.e_name={division}"""
-		end=" return (reco) order by reco.SDRate limit 20"
+        end = " return (reco) order by reco.SDRate limit 20"
 
-		query=begin+in_month+in_category+end
-		
-		return graph.run(query,division=location,category=category)
+        query = begin + in_month + in_category + end
 
-	def res_similiar_search1(user1):
+        return graph.run(query, division=location, category=category)
 
-		user=user1.find()
-		username=user['username']
-		query="""
+    def res_similiar_search1(self, user1):
+
+        user = user1.find()
+        username = user['username']
+        query = """
 		match p=(u:User)-[rel:INTEREST]->(res:Restaurant) 
 		where u.username={username}
 		with u, rel, res order by rel.level desc limit 3
@@ -220,13 +219,13 @@ class RecoEngine:
 		return distinct reco limit 20
 
 		"""
-		return graph.run(query,username=username)
+        return graph.run(query, username=username)
 
-	def res_relating_search1(user1):
+    def res_relating_search1(self, user1):
 
-		user=user1.find()
-		username=user['username']		
-		query="""
+        user = user1.find()
+        username = user['username']
+        query = """
 		match p=(u:User)-[rel:INTEREST]->(res:Restaurant) 
 		where u.username={username}
 		with u, rel, res order by rel.level desc limit 3
@@ -236,30 +235,30 @@ class RecoEngine:
 		return distinct reco
 
 		"""
-		return graph.run(query,username=username)
+        return graph.run(query, username=username)
 
-#########################################################################################
-	def top_places1(division):
+    #########################################################################################
+    def top_places1(self, division):
 
-		query="""
+        query = """
 		match (reco:Restaurant)<-[rel:TOP_PLACE]-(d:Division)
 			where d.e_name={location}
 			with reco,rel.top_place as top_place
 			return reco order by top_place desc
 		"""
-		return graph.run(query,location=division)
+        return graph.run(query, location=division)
 
-	def res_relating_search2(user1):
+    def res_relating_search2(self, user1):
 
-		user=user1.find()
-		username=user['username']	
-			
-		query1="""
+        user = user1.find()
+        username = user['username']
+
+        query1 = """
 		match p=(u:User)-[rel:INTEREST]->(res:Restaurant) 
 		where u.username={username}
 		"""
 
-		query="""
+        query = """
 		match p=(u:User)-[rel:INTEREST]->(res:Restaurant) 
 		where u.username={username} 
 		with u, rel, res order by rel.level desc limit 3
@@ -269,99 +268,99 @@ class RecoEngine:
 		return distinct reco
 
 		"""
-		return graph.run(query,username=username)
-###############################################################################################
-	def res_this_month(loc,cat,user1):
-		#find today month
-		now=datetime.now()
-		month=now.month
+        return graph.run(query, username=username)
 
-		#get the user
-		user=user1.find()
-		username=user["username"]
+    ###############################################################################################
+    def res_this_month(self, loc, cat, user1):
+        # find today month
+        now = datetime.now()
+        month = now.month
 
-		if loc=="":
-			in_division=""
-		else:
-			in_division=" and d.e_name="+"\""+loc+"\" "
+        # get the user
+        user = user1.find()
+        username = user["username"]
 
-		if cat=="":
-			in_category=""
-		else:
-			in_category=" and c.SDCategory="+"\""+cat+"\" "
+        if loc == "":
+            in_division = ""
+        else:
+            in_division = " and d.e_name=" + "\"" + loc + "\" "
 
-		#fit in the query
-		begin="""
+        if cat == "":
+            in_category = ""
+        else:
+            in_category = " and c.SDCategory=" + "\"" + cat + "\" "
+
+        # fit in the query
+        begin = """
 			Match (u:User) where u.username={username}
 			WITH point({latitude:u.latitude,longitude:u.longitude}) AS mapcenter
 
 			MATCH (reco:Restaurant)-[:IN_DIVISION]->(d:Division),
 				  (reco)-[rel:BY_MONTH]->(m:Month),
 				(reco)-[:IN_CATEGORY]->(c:Category) """
-		m="where m.month={month} "
+        m = "where m.month={month} "
 
-		end="""
+        end = """
 		 WITH reco, distance (point({latitude: reco.latitude, longitude: reco.longitude}), mapcenter) AS distance ,rel,c
 			RETURN distinct reco,distance,c.SDCategory as cat, rel.m_avg as month_score
 			ORDER BY month_score desc LIMIT 20
 		"""
-		query=begin+m+in_division+in_category+end
+        query = begin + m + in_division + in_category + end
 
-		return graph.run(query,username=username,month=month)
+        return graph.run(query, username=username, month=month)
 
+    def more(self, loc, cat, mon, user1):
+        # get the user
+        user = user1.find()
+        username = user["username"]
 
-	def more(loc,cat,mon,user1):
-		#get the user
-		user=user1.find()
-		username=user["username"]
+        if loc == "":
+            in_division = ""
+        else:
+            in_division = " d.e_name=" + "\"" + loc + "\" "
 
-		if loc=="":
-			in_division=""
-		else:
-			in_division=" d.e_name="+"\""+loc+"\" "
+        if cat == "":
+            in_category = ""
+        else:
+            in_category = " and c.SDCategory=" + "\"" + cat + "\" "
 
-		if cat=="":
-			in_category=""
-		else:
-			in_category=" and c.SDCategory="+"\""+cat+"\" "
+        if mon == "":
+            in_month = ""
+        else:
+            in_month = " and m.month= " + mon + " "
 
-		if mon=="":
-			in_month=""
-		else:
-			in_month=" and m.month= "+mon+" "
-
-		#fit in query
-		begin="""
+        # fit in query
+        begin = """
 			Match (u:User) where u.username={username}
 			WITH point({latitude:u.latitude,longitude:u.longitude}) AS mapcenter
 
 			MATCH (reco:Restaurant)-[:IN_DIVISION]->(d:Division),
 				  (reco)-[rel:BY_MONTH]->(m:Month),
 				(reco)-[:IN_CATEGORY]->(c:Category) where """
-		
-		if mon=="":
-			end="""
+
+        if mon == "":
+            end = """
 			WITH distinct reco, distance (point({latitude: reco.latitude, longitude: reco.longitude}), mapcenter) AS distance ,rel,c
 				RETURN reco,distance
 				ORDER BY reco.SDRate desc LIMIT 20
 			"""
-		else:
+        else:
 
-			end="""
+            end = """
 			 WITH reco, distance (point({latitude: reco.latitude, longitude: reco.longitude}), mapcenter) AS distance ,rel,c
 				RETURN reco,distance, rel.m_avg as month_score
 				ORDER BY month_score desc LIMIT 20
 			"""
 
-		query=begin+in_division+in_category+in_month+end
+        query = begin + in_division + in_category + in_month + end
 
-		return graph.run(query,username=username)
+        return graph.run(query, username=username)
 
-	def near_you2(user1):
-		user=user1.find()
-		username=user['username']
+    def near_you2(self, user1):
+        user = user1.find()
+        username = user['username']
 
-		query="""
+        query = """
 		Match (u:User) where u.username={username}
 		WITH point({latitude:u.latitude,longitude:u.longitude}) AS mapcenter
 		MATCH (reco:Restaurant)-[:IN_DIVISION]->(d:Division)
@@ -370,24 +369,25 @@ class RecoEngine:
 		RETURN reco, distance
 		ORDER BY distance LIMIT 5
 		"""
-		return graph.run(query,username=username)
-############################################################################################################################################
-	def relating(shopId):
+        return graph.run(query, username=username)
 
-		idd=int(shopId)
-		query="""match(n:Restaurant{shopId:{idd}}),
+    ############################################################################################################################################
+    def relating(self, shopId):
+
+        idd = int(shopId)
+        query = """match(n:Restaurant{shopId:{idd}}),
 		path=(n)-[r:NEIGHBOR*1..2]-(reco) 
 		with reduce(cost=0,r in rels(path)|cost+r.cost) as totalWeight,path,(n),(reco)
 		return distinct reco, totalWeight order by totalWeight limit 5"""
 
-		return graph.run(query,idd=idd)
+        return graph.run(query, idd=idd)
 
-	def more2(location,category,month,user1):
-		user=user1.find()
-		username=user["username"]
+    def more2(self, location, category, month, user1):
+        user = user1.find()
+        username = user["username"]
 
-		if category=='all' and month=='all':
-			query="""
+        if category == 'all' and month == 'all':
+            query = """
 			Match (u:User) where u.username={username}
 			WITH point({latitude:u.latitude,longitude:u.longitude}) AS mapcenter
 			MATCH (reco:Restaurant)-[:IN_DIVISION]->(d:Division) where d.e_name={location}
@@ -395,10 +395,10 @@ class RecoEngine:
 			RETURN reco, distance
 			ORDER BY distance LIMIT 30
 			"""
-			return graph.data(query,username=username,location=location)
+            return graph.data(query, username=username, location=location)
 
-		if category!='all' and month=='all':
-			query="""
+        if category != 'all' and month == 'all':
+            query = """
 			Match (u:User) where u.username={username}
 			WITH point({latitude:u.latitude,longitude:u.longitude}) AS mapcenter
 			MATCH (reco:Restaurant)-[:IN_DIVISION]->(d:Division),
@@ -408,12 +408,12 @@ class RecoEngine:
 			RETURN reco, reco.SDRate,distance
 			ORDER BY distance LIMIT 30
 			"""
-			return graph.data(query,username=username,location=location,category=category)
+            return graph.data(query, username=username, location=location, category=category)
 
-		if category=='all' and month!='all':
-			month1=int(month)
+        if category == 'all' and month != 'all':
+            month1 = int(month)
 
-			query="""
+            query = """
 			Match (u:User) where u.username={username}
 			WITH point({latitude:u.latitude,longitude:u.longitude}) AS mapcenter
 			MATCH (d:Division)-[:IN_MONTH]-(m:Month)-[b:BY_MONTH]-(reco:Restaurant)
@@ -423,11 +423,11 @@ class RecoEngine:
 			ORDER BY review_num desc LIMIT 30
 			"""
 
-			return graph.data(query,username=username,location=location,month=month1)	
+            return graph.data(query, username=username, location=location, month=month1)
 
-		if category!='all' and month!='all':
-			month1= int(month)
-			query="""
+        if category != 'all' and month != 'all':
+            month1 = int(month)
+            query = """
 			Match (u:User) where u.username={username}
 			WITH point({latitude:u.latitude,longitude:u.longitude}) AS mapcenter
 			MATCH (reco)-[:IN_DIVISION]->(d:Division), (reco)-[:IN_CATEGORY]->(c:Category), (reco)-[b:BY_MONTH]->(m:Month)
@@ -436,99 +436,102 @@ class RecoEngine:
 			RETURN reco,b.no_reviews as review_num,b.m_avg as month_avg,distance
 			ORDER BY month_avg desc LIMIT 30
 
-			"""	
-			return graph.data(query,username=username,location=location,category=category,month=month1)
+			"""
+            return graph.data(query, username=username, location=location, category=category, month=month1)
 
-
-	def getDivision():
-		query="""
+    def getDivision(self):
+        query = """
 			match (n:Division) return n.e_name as area
 		"""
-		return graph.data(query)
+        return graph.data(query)
 
-	def getCategory():
-		query="""
+    def getCategory(self):
+        query = """
 			match (n:Category) return n.SDCategory as category
 		"""
-		return graph.data(query)
+        return graph.data(query)
 
-	def getMonth():
-		query="""
+    def getMonth(self):
+        query = """
 			match (n:Month) return distinct n.month as month
 		"""
-		return graph.data(query)
+        return graph.data(query)
 
-	def getDetail(shopId1):
-		shopId=int(shopId1)
-		query="""
+    def getDetail(self, shopId1):
+        shopId = int(shopId1)
+        query = """
 		match (reco:Restaurant)<-[:ABOUT]-(r:Review) where reco.shopId={shopId}
 		return reco
 		"""
-		return graph.data(query,shopId=shopId)
+        return graph.data(query, shopId=shopId)
 
-	def getReviews(shopId1):
-		shopId=int(shopId1)
-		query="""
+    def getReviews(self, shopId1):
+        shopId = int(shopId1)
+        query = """
 		match (n:Restaurant)<-[:ABOUT]-(review:Review) where n.shopId={shopId}
 		return review order by review.SDRate desc limit 5
 		"""
-		return graph.data(query,shopId=shopId)
+        return graph.data(query, shopId=shopId)
 
-	def topPlace():
-		query="""
+    def topPlace(self):
+        query = """
 		Match (D:Division)-[:TOP_PLACE]->(reco:Restaurant)
-		return distinct reco order by reco.SDRate desc limit 5
+		return distinct reco order by reco.SDRate desc limit 4
 		"""
-		return graph.data(query)
+        return graph.data(query)
 
-	def currentSeason():
-		now=datetime.now()
-		month=int(now.month)
+    def currentSeason(self):
+        now = datetime.now()
+        month = int(now.month)
 
-		if month>=3 and month <=5:
-			season="Spring"
-		if month>=6 and month<=8:
-			season="Summer"
-		if month>=9 and month<=11:
-			season="Autumn"
-		if month==12 or month==1 or month==2:
-			season="Winter"
+        if month >= 3 and month <= 5:
+            season = "Spring"
+        if month >= 6 and month <= 8:
+            season = "Summer"
+        if month >= 9 and month <= 11:
+            season = "Autumn"
+        if month == 12 or month == 1 or month == 2:
+            season = "Winter"
 
-		query="""
+        query = """
 		Match (s:Season)-[:IN_SEASON]-(m:Month)-[:MONTH_TOP]-(reco:Restaurant) where s.season={season}
-		return distinct reco order by reco.reviewCount desc limit 7
+		return distinct reco order by reco.reviewCount desc limit 8
 		"""
-		return graph.data(query,season=season)
+        return graph.data(query, season=season)
 
-	def topRes(division):
-		location=division
-		query="""
+    def topRes(self, division):
+        location = division
+        query = """
 		Match (n:Division)-[:TOP_PLACE]->(reco) where n.e_name={division}
-		return reco
+		return reco LIMIT 4
 		"""
-		return graph.data(query,division=location)
+        return graph.data(query, division=location)
 
-	def topResJiaoxi():
-		query="""
+    def topResJiaoxi(self):
+        query = """
 		Match (n:Division)-[:TOP_PLACE]->(reco) where n.e_name="礁溪鄉"
-		return reco
+		return reco LIMIT 4
 		"""
-		return graph.data(query)
-	def topResToucheng():
-		query="""
+        return graph.data(query)
+
+    def topResToucheng(self):
+        query = """
 		Match (n:Division)-[:TOP_PLACE]->(reco) where n.e_name="頭城鎮"
-		return reco
+		return reco LIMIT 4
 		"""
-		return graph.data(query)
-	def topResDongshan():
-		query="""
+        return graph.data(query)
+
+    def topResDongshan(self):
+        query = """
 		Match (n:Division)-[:TOP_PLACE]->(reco) where n.e_name="冬山鄉"
-		return reco
+		return reco LIMIT 4
 		"""
-		return graph.data(query)	
+        return graph.data(query)
+
+
 ##############################################################################################
 def timestamp():
-	epoch = datetime.utcfromtimestamp(0)
-	now = datetime.now()
-	delta = now - epoch
-	return delta.total_seconds()
+    epoch = datetime.utcfromtimestamp(0)
+    now = datetime.now()
+    delta = now - epoch
+    return delta.total_seconds()

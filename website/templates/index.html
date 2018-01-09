@@ -1,184 +1,239 @@
-{% extends "layout_noborder.html" %}
+{% extends "layout.html" %}
 
 {% block content %}
     {% include "head.html" %}
+    <div class="container">
+        {#        <!-- Page Content -->#}
+        {#        <section class="py-5">#}
+        {#            <div class="container">#}
+        {#                <div>#}
+        {##}
+        {#                    <button onclick="getLocation()">Geolocation Demo</button>#}
+        {#                    <p id="demo"></p>#}
+        {#                </div>#}
+        {#            </div>#}
+        {#        </section>#}
 
-    <!-- Page Content -->
-    <section class="py-5">
-        <div class="container">
-            <div>
 
-                <button onclick="getLocation()">Geolocation Demo</button>
-                <p id="demo"></p>
+        {#        <h1>General Search:</h1>#}
+        {##}
+        {#        <div>#}
+        {#            <form action="{{ url_for('show') }}" method="post">#}
+        {#                <br>#}
+        {#                Area:#}
+        {#                <select name="division">#}
+        {#                    {% for row in division %}#}
+        {#                        <option value={{ row['area'] }}>{{ row['area'] }}</option>#}
+        {#                    {% endfor %}#}
+        {#                </select>#}
+        {##}
+        {#                <br>#}
+        {#                <br>#}
+        {#                Category:#}
+        {#                <select name="category">#}
+        {#                    <option value="all">all</option>#}
+        {#                    {% for row in category %}#}
+        {#                        <option value={{ row['category'] }}>{{ row.category }}</option>#}
+        {#                    {% endfor %}#}
+        {#                </select>#}
+        {##}
+        {#                <br>#}
+        {#                <br>#}
+        {#                Month:#}
+        {#                <select name="month">#}
+        {#                    <option value="all">all</option>#}
+        {#                    {% for row in month %}#}
+        {#                        <option value={{ row['month'] }}>{{ row.month }}</option>#}
+        {#                    {% endfor %}#}
+        {#                </select>#}
+        {##}
+        {#                <br>#}
+        {#                <input type="submit" value="submit">#}
+        {#            </form>#}
+        {#        </div>#}
+        {##########################################################################################}
+        {% if session.username %}
+            <div class="col-12">
+            <div class="row">
+                <h1> Near You </h1>
+                <div class="card-deck">
+                    {% for row in nearyou %}
+                        <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
+                            <div class="card border-light" style="max-width: 18rem;">
+                                <img src="http://via.placeholder.com/220x150">
+                                {#                                <img class="card-img-top"#}
+                                {#                                     src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
+                                {#                                     alt="Card image cap" width="100px" height="100px">#}
+                                <div class="card-body">
+                                    <h6 class="card-title">{{ row['reco']['shopName'] }}</h6>
+                                    <p>{{ row['reco'['SDRate']] }}</p>
+                                    <p>{{ row['cat'] }}</p>
+                                    <p>{{ row['reco']['price'] }}</p>
+                                    <p class="card-text"></p>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        <div class="row">
+            <h1> This Season </h1>
+            <div class="card-deck">
+                {% for row in season %}
+                    <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
+                        <div class="card border-light">
+                            <img src="http://via.placeholder.com/220x150">
+                            {#                            <img class="card-img-top"#}
+                            {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
+                            {#                                 alt="Card image cap" width="100px" height="100px">#}
+                            <div class="card-body">
+                                <h6 class="card-title">{{ row['reco']['shopName'] }}</h6>
+                                <p>{{ row['reco'['SDRate']] }}</p>
+                                <p>{{ row['cat'] }}</p>
+                                <p>{{ row['reco']['price'] }}</p>
+                                <p class="card-text"></p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
             </div>
         </div>
-    </section>
 
-
-    <div>
-        <form action="{{ url_for('show') }}" method="post">
-            <br>
-            Area:
-            <select name="division">
-                {% for row in division %}
-                    <option value={{ row['area'] }}>{{ row['area'] }}</option>
+        <div class="row">
+            <h1>Popular Restaurant</h1>
+            <div class="card-deck">
+                {% for row in popular %}
+                    <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
+                        <div class="card border-light">
+                            <img src="http://via.placeholder.com/220x150">
+                            {#                            <img class="card-img-top"#}
+                            {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
+                            {#                                 alt="Card image cap" width="100px" height="100px">#}
+                            <div class="card-body">
+                                <h6 class="card-title">{{ row['reco']['shopName'] }}</h6>
+                                <p>{{ row['reco'['SDRate']] }}</p>
+                                <p>{{ row['cat'] }}</p>
+                                <p>{{ row['reco']['price'] }}</p>
+                                <p class="card-text"></p>
+                            </div>
+                        </div>
+                    </a>
                 {% endfor %}
-            </select>
-
-            </br>
-            <br>
-            Category:
-            <select name="category">
-                <option value="all">all</option>
-                {% for row in category %}
-                    <option value={{ row['category'] }}>{{ row.category }}</option>
-                {% endfor %}
-            </select>
-
-            </br>
-            <br>
-            Month:
-            <select name="month">
-                <option value="all">all</option>
-                {% for row in month %}
-                    <option value={{ row['month'] }}>{{ row.month }}</option>
-                {% endfor %}
-            </select>
-
-            </br>
-            <input type="submit" value="submit">
-        </form>
-    </div>
-    {% if session.username %}
-        <div>
-            <h1> Near You </h1>
-            {% for row in nearyou %}
-                <p>
-                    name:{{ row['reco']['shopName'] }},
-                    add:{{ row['reco']['SDAddress'] }},
-                    lat:{{ row['reco']['latitude'] }},
-                    lon:{{ row['reco']['longitude'] }},
-                    SDRate:{{ row['reco'['SDRate']] }}
-                    cat:{{ row['cat'] }},
-                    distance:{{ row['distance'] }}
-                    price: {{ row['reco']['price'] }}
-                    <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
-                </p>
-            {% endfor %}
+            </div>
         </div>
-    {% endif %}
-    <div>
-        <h1> This Season </h1>
-        {% for row in season %}
-            <p>
-                name:{{ row['reco']['shopName'] }},
-                add:{{ row['reco']['SDAddress'] }},
-                lat:{{ row['reco']['latitude'] }},
-                lon:{{ row['reco']['longitude'] }},
-                SDRate:{{ row['reco'['SDRate']] }}
-                cat:{{ row['cat'] }},
-                distance:{{ row['distance'] }}
-                price: {{ row['reco']['price'] }}
-                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
-            </p>
-        {% endfor %}
+        <div class="row">
+            <h1> Popular in Yilan City </h1>
+            <div class="card-deck">
+                {% for row in yilan %}
+                    <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
+                        <div class="card border-light">
+                            <img src="http://via.placeholder.com/220x150">
+                            {#                            <img class="card-img-top"#}
+                            {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
+                            {#                                 alt="Card image cap" width="100px" height="100px">#}
+                            <div class="card-body">
+                                <h6 class="card-title">{{ row['reco']['shopName'] }}</h6>
+                                <p>{{ row['reco'['SDRate']] }}</p>
+                                <p>{{ row['cat'] }}</p>
+                                <p>{{ row['reco']['price'] }}</p>
+                                <p class="card-text"></p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <h1> Popular in Loudong </h1>
 
-    </div>
+            <div class="card-deck">
+                {% for row in loudong %}
+                    <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
+                        <div class="card border-light">
+                            <img src="http://via.placeholder.com/220x150">
+                            {#                            <img class="card-img-top"#}
+                            {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
+                            {#                                 alt="Card image cap" width="100px" height="100px">#}
+                            <div class="card-body">
+                                <h6 class="card-title">{{ row['reco']['shopName'] }}</h6>
+                                <p>{{ row['reco'['SDRate']] }}</p>
+                                <p>{{ row['cat'] }}</p>
+                                <p>{{ row['reco']['price'] }}</p>
+                                <p class="card-text"></p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <h1> Popular in Jiaoxi </h1>
 
-    <div>
-        <h1>Popular Restaurant</h1>
-        {% for row in popular %}
-            <p>
-                name:{{ row['reco']['shopName'] }},
-                add:{{ row['reco']['SDAddress'] }},
-                lat:{{ row['reco']['latitude'] }},
-                lon:{{ row['reco']['longitude'] }},
-                SDRate:{{ row['reco'['SDRate']] }}
-                cat:{{ row['cat'] }},
-                distance:{{ row['distance'] }}
-                price: {{ row['reco']['price'] }}
-                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
-            </p>
-        {% endfor %}
-    </div>
-    <div>
-        <h1> Popular in Yilan City </h1>
-        {% for row in yilan %}
-            <p>
-                name:{{ row['reco']['shopName'] }},
-                add:{{ row['reco']['SDAddress'] }},
-                lat:{{ row['reco']['latitude'] }},
-                lon:{{ row['reco']['longitude'] }},
-                SDRate:{{ row['reco'['SDRate']] }}
-                cat:{{ row['cat'] }},
-                distance:{{ row['distance'] }}
-                price: {{ row['reco']['price'] }}
-                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
-            </p>
-        {% endfor %}
-    </div>
-    <div>
-        <h1> Popular in Loudong </h1>
-        {% for row in loudong %}
-            <p>
-                name:{{ row['reco']['shopName'] }},
-                add:{{ row['reco']['SDAddress'] }},
-                lat:{{ row['reco']['latitude'] }},
-                lon:{{ row['reco']['longitude'] }},
-                SDRate:{{ row['reco'['SDRate']] }}
-                cat:{{ row['cat'] }},
-                distance:{{ row['distance'] }}
-                price: {{ row['reco']['price'] }}
-                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
-            </p>
-        {% endfor %}
-    </div>
-    <div>
-        <h1> Popular in Jiaoxi </h1>
-        {% for row in jiaoxi %}
-            <p>
-                name:{{ row['reco']['shopName'] }},
-                add:{{ row['reco']['SDAddress'] }},
-                lat:{{ row['reco']['latitude'] }},
-                lon:{{ row['reco']['longitude'] }},
-                SDRate:{{ row['reco'['SDRate']] }}
-                cat:{{ row['cat'] }},
-                distance:{{ row['distance'] }}
-                price: {{ row['reco']['price'] }}
-                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
-            </p>
-        {% endfor %}
-    </div>
-    <div>
-        <h1> Popular in Toucheng </h1>
-        {% for row in toucheng %}
-            <p>
-                name:{{ row['reco']['shopName'] }},
-                add:{{ row['reco']['SDAddress'] }},
-                lat:{{ row['reco']['latitude'] }},
-                lon:{{ row['reco']['longitude'] }},
-                SDRate:{{ row['reco'['SDRate']] }}
-                cat:{{ row['cat'] }},
-                distance:{{ row['distance'] }}
-                price: {{ row['reco']['price'] }}
-                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
-            </p>
-        {% endfor %}
-    </div>
-    <div>
-        <h1> Popular in Dongshan </h1>
-        {% for row in dongshan %}
-            <p>
-                name:{{ row['reco']['shopName'] }},
-                add:{{ row['reco']['SDAddress'] }},
-                lat:{{ row['reco']['latitude'] }},
-                lon:{{ row['reco']['longitude'] }},
-                SDRate:{{ row['reco'['SDRate']] }}
-                cat:{{ row['cat'] }},
-                distance:{{ row['distance'] }}
-                price: {{ row['reco']['price'] }}
-                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
-            </p>
-        {% endfor %}
+            <div class="card-deck">
+                {% for row in jiaoxi %}
+                    <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
+                        <div class="card border-light">
+                            <img src="http://via.placeholder.com/220x150">
+                            {#                            <img class="card-img-top"#}
+                            {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
+                            {#                                 alt="Card image cap" width="100px" height="100px">#}
+                            <div class="card-body">
+                                <h6 class="card-title">{{ row['reco']['shopName'] }}</h6>
+                                <p>{{ row['reco'['SDRate']] }}</p>
+                                <p>{{ row['cat'] }}</p>
+                                <p>{{ row['reco']['price'] }}</p>
+                                <p class="card-text"></p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <h1> Popular in Toucheng </h1>
+            <div class="card-deck">
+                {% for row in toucheng %}
+                    <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
+                        <div class="card border-light">
+                            <img src="http://via.placeholder.com/220x150">
+                            {#                            <img class="card-img-top"#}
+                            {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
+                            {#                                 alt="Card image cap" width="100px" height="100px">#}
+                            <div class="card-body">
+                                <h6 class="card-title">{{ row['reco']['shopName'] }}</h6>
+                                <p>{{ row['reco'['SDRate']] }}</p>
+                                <p>{{ row['cat'] }}</p>
+                                <p>{{ row['reco']['price'] }}</p>
+                                <p class="card-text"></p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row">
+            <h1> Popular in Dongshan </h1>
+            <div class="card-deck">
+                {% for row in dongshan %}
+                    <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
+                        <div class="card border-light">
+                            <img src="http://via.placeholder.com/220x150">
+                            {#                            <img class="card-img-top"#}
+                            {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
+                            {#                                 alt="Card image cap" width="100px" height="100px">#}
+                            <div class="card-body">
+                                <h6 class="card-title">{{ row['reco']['shopName'] }}</h6>
+                                <p>{{ row['reco'['SDRate']] }}</p>
+                                <p>{{ row['cat'] }}</p>
+                                <p>{{ row['reco']['price'] }}</p>
+                                <p class="card-text"></p>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+        </div>
     </div>
 {% endblock %}
