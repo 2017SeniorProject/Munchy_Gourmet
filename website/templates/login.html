@@ -1,6 +1,6 @@
-<!DOCTYPE html>
-<html>
-<body>  
+{% extends "layout.html" %}
+{% block content %}
+
   <h2>Login</h2>
 	<form action="{{ url_for('login') }}" method="post">
         <dl>
@@ -11,5 +11,4 @@
         </dl>
         <input type="submit" value="Login">
 	</form>
-</body>
-</html>
+{% endblock %}
