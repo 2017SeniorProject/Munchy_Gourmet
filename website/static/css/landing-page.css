@@ -9,6 +9,17 @@ header.masthead {
     padding-top: 8rem;
     padding-bottom: 8rem;
 }
+header.masthead2 {
+    position: relative;
+    background-color: #343a40;
+    background: url("../img/s2.jpg") no-repeat center center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    padding-top: 8rem;
+    padding-bottom: 8rem;
+}
 
 header.masthead .overlay {
     position: absolute;

@@ -3,33 +3,6 @@
 {% block content %}
     {% include "head.html" %}
     <div class="container">
-{#        <h1>General Search:</h1>#}
-{##}
-{#        <div>#}
-{#            <form action="{{ url_for('show') }}" method="post">#}
-{#                Category:#}
-{#                <select name="category">#}
-{#                    <option value="all">all</option>#}
-{#                    {% for row in category %}#}
-{#                        <option value={{ row['category'] }}>{{ row.category }}</option>#}
-{#                    {% endfor %}#}
-{#                </select>#}
-{##}
-{#                <br>#}
-{#                <br>#}
-{#                Month:#}
-{#                <select name="month">#}
-{#                    <option value="all">all</option>#}
-{#                    {% for number in range(12) %}#}
-{#                        <option value={{ number }}>{{ number }}</option>#}
-{#                    {% endfor %}#}
-{#                </select>#}
-{##}
-{#                <br>#}
-{#                <input type="submit" value="submit">#}
-{#            </form>#}
-{#        </div>#}
-        {##########################################################################################}
         {% if session.username %}
             <br>
             <br>
@@ -42,7 +15,9 @@
                     {% for row in nearyou %}
                         <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
                             <div class="card border-light" style="max-width: 18rem;">
-                                <img src="http://via.placeholder.com/220x150">
+
+                                <img src="http://lorempixel.com/220/150/food/{{ range(1, 10) | random }}/">
+{#                                <img src="http://via.placeholder.com/220x150">#}
                                 {#                                <img class="card-img-top"#}
                                 {#                                     src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
                                 {#                                     alt="Card image cap" width="100px" height="100px">#}
@@ -65,7 +40,8 @@
                 {% for row in season %}
                     <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
                         <div class="card border-light">
-                            <img src="http://via.placeholder.com/220x150">
+                            <img src="http://lorempixel.com/220/150/food/{{ range(1, 10) | random }}/">
+{#                            <img src="http://via.placeholder.com/220x150">#}
                             {#                            <img class="card-img-top"#}
                             {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
                             {#                                 alt="Card image cap" width="100px" height="100px">#}
@@ -88,7 +64,8 @@
                 {% for row in popular %}
                     <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
                         <div class="card border-light">
-                            <img src="http://via.placeholder.com/220x150">
+                            <img src="http://lorempixel.com/220/150/food/{{ range(1, 10) | random }}/">
+{#                            <img src="http://via.placeholder.com/220x150">#}
                             {#                            <img class="card-img-top"#}
                             {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
                             {#                                 alt="Card image cap" width="100px" height="100px">#}
@@ -110,7 +87,8 @@
                 {% for row in yilan %}
                     <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
                         <div class="card border-light">
-                            <img src="http://via.placeholder.com/220x150">
+                            <img src="http://lorempixel.com/220/150/food/{{ range(1, 10) | random }}/">
+{#                            <img src="http://via.placeholder.com/220x150">#}
                             {#                            <img class="card-img-top"#}
                             {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
                             {#                                 alt="Card image cap" width="100px" height="100px">#}
@@ -133,7 +111,8 @@
                 {% for row in loudong %}
                     <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
                         <div class="card border-light">
-                            <img src="http://via.placeholder.com/220x150">
+                            <img src="http://lorempixel.com/220/150/food/{{ range(1, 10) | random }}/">
+{#                            <img src="http://via.placeholder.com/220x150">#}
                             {#                            <img class="card-img-top"#}
                             {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
                             {#                                 alt="Card image cap" width="100px" height="100px">#}
@@ -156,7 +135,8 @@
                 {% for row in jiaoxi %}
                     <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
                         <div class="card border-light">
-                            <img src="http://via.placeholder.com/220x150">
+                            <img src="http://lorempixel.com/220/150/food/{{ range(1, 10) | random }}/">
+{#                            <img src="http://via.placeholder.com/220x150">#}
                             {#                            <img class="card-img-top"#}
                             {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
                             {#                                 alt="Card image cap" width="100px" height="100px">#}
@@ -178,7 +158,8 @@
                 {% for row in toucheng %}
                     <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
                         <div class="card border-light">
-                            <img src="http://via.placeholder.com/220x150">
+                            <img src="http://lorempixel.com/220/150/food/{{ range(1, 10) | random }}/">
+{#                            <img src="http://via.placeholder.com/220x150">#}
                             {#                            <img class="card-img-top"#}
                             {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
                             {#                                 alt="Card image cap" width="100px" height="100px">#}
@@ -200,7 +181,8 @@
                 {% for row in dongshan %}
                     <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
                         <div class="card border-light">
-                            <img src="http://via.placeholder.com/220x150">
+                            <img src="http://lorempixel.com/220/150/food/{{ range(1, 10) | random }}/">
+{#                            <img src="http://via.placeholder.com/220x150">#}
                             {#                            <img class="card-img-top"#}
                             {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
                             {#                                 alt="Card image cap" width="100px" height="100px">#}

@@ -1,39 +1,52 @@
 {% extends "layout.html" %}
 
 {% block content %}
+
+
+    <br>
+    <br>
+    <br>
     <div class="container">
-
-
+    <h2>Result of {{ location }} for {{ category }}</h2>
+    </div>
+    <br>
+    <br>
         <div id="map" style="height: 500px;"></div>
 
-        <script type="text/javascript">
-            // The first parameter are the coordinates of the center of the map
-            // The second parameter is the zoom level
-            var map = L.map('map').setView([40.712, -74.006], 11);
+    <script type="text/javascript">
+        // The first parameter are the coordinates of the center of the map
+        // The second parameter is the zoom level
+        var map = L.map('map').setView([40.712, -74.006], 11);
 
-            var layer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
-            });
+        var layer = L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="http://cartodb.com/attributions">CartoDB</a>'
+        });
 
-            // Now add the layer onto the map
-            map.addLayer(layer);
+        // Now add the layer onto the map
+        map.addLayer(layer);
 
-            // It even opens up a popup when you click it!
-            {% for row in recommendation %}
+        // It even opens up a popup when you click it!
+        {% for row in recommendation %}
 
-                L.marker([{{ row['reco']['latitude'] }}, {{ row['reco']['longitude'] }}]).addTo(map)
-                    .bindPopup("<strong>{{ row['reco']['shopName'] }}</strong>").openPopup();
+            L.marker([{{ row['reco']['latitude'] }}, {{ row['reco']['longitude'] }}]).addTo(map)
+                .bindPopup("<strong>{{ row['reco']['shopName'] }}</strong>").openPopup();
 
-            {% endfor %}
+        {% endfor %}
 
-        </script>
-
+    </script>
+    <div class="container">
+        <br>
+        <br>
+        <h2>Restaurants Suggestions</h2>
+        <br>
+        <br>
 
         <div class="card-deck">
             {% for row in recommendation %}
                 <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
                     <div class="card border-light">
-                        <img src="http://via.placeholder.com/220x150">
+                        <img src="http://lorempixel.com/220/150/food/{{ range(1, 10) | random }}/">
+{#                        <img src="http://via.placeholder.com/220x150">#}
                         {#                            <img class="card-img-top"#}
                         {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
                         {#                                 alt="Card image cap" width="100px" height="100px">#}
@@ -48,20 +61,20 @@
                 </a>
             {% endfor %}
         </div>
-{#        <div>#}
-{#            {% for row in recommendation %}#}
-{#                <p>#}
-{#                    name:{{ row['reco']['shopName'] }},#}
-{#                    add:{{ row['reco']['SDAddress'] }},#}
-{#                    lat:{{ row['reco']['latitude'] }},#}
-{#                    lon:{{ row['reco']['longitude'] }},#}
-{#                    SDRate:{{ row['reco'['SDRate']] }}#}
-{#                    cat:{{ row['SDCategory'] }},#}
-{#                    distance:{{ row['distance'] }}#}
-{#                    price:{{ row['reco']['price'] }}#}
-{#                    <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>#}
-{#                </p>#}
-{#            {% endfor %}#}
-{#        </div>#}
+        {#        <div>#}
+        {#            {% for row in recommendation %}#}
+        {#                <p>#}
+        {#                    name:{{ row['reco']['shopName'] }},#}
+        {#                    add:{{ row['reco']['SDAddress'] }},#}
+        {#                    lat:{{ row['reco']['latitude'] }},#}
+        {#                    lon:{{ row['reco']['longitude'] }},#}
+        {#                    SDRate:{{ row['reco'['SDRate']] }}#}
+        {#                    cat:{{ row['SDCategory'] }},#}
+        {#                    distance:{{ row['distance'] }}#}
+        {#                    price:{{ row['reco']['price'] }}#}
+        {#                    <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>#}
+        {#                </p>#}
+        {#            {% endfor %}#}
+        {#        </div>#}
     </div>
 {% endblock %}
