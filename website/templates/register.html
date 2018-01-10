@@ -1,14 +1,44 @@
 {% extends "layout.html" %}
 
 {% block content %}
-  <h2>Register</h2>
-	<form action="{{ url_for('register') }}" method="post">
-        <dl>
-            <dt>Username:</dt>
-            <dd><input type="text" name="username"></dd>
-            <dt>Password:</dt>
-            <dd><input type="password" name="password"></dd>
-        </dl>
-        <input type="submit" value="Register">
-	</form>
+{#    <h2>Register</h2>#}
+{#    <form action="{{ url_for('register') }}" method="post">#}
+{#        <dl>#}
+{#            <dt>Username:</dt>#}
+{#            <dd><input type="text" name="username"></dd>#}
+{#            <dt>Password:</dt>#}
+{#            <dd><input type="password" name="password"></dd>#}
+{#        </dl>#}
+{#        <input type="submit" value="Register">#}
+{#    </form>#}
+
+    <div class="container">
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="col-6">
+            <form action="{{ url_for('register') }}" method="post">
+                <h2>Sign up</h2>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">Username</label>
+                    <input type="text" name="username" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword1">Password</label>
+                    <input type="password" name="password" class="form-control">
+                </div>
+                <input type="submit" value="Register" class="btn btn-success">
+            </form>
+
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
+        </div>
+    </div>
 {% endblock %}

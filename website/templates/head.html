@@ -7,24 +7,33 @@
                 <h4 class="mb-5">Recommending System For FOODS !</h4>
             </div>
             <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
-                <form>
-                    <div class="form-row">
-                        <div class="col-12 col-md-9 mb-2 mb-md-0">
-                            <input type="email" class="form-control form-control-lg"
-                                   placeholder="What's in your mind ?">
+                <form action="{{ url_for('show') }}" method="post">
+                    <div class="form-row align-items-center">
+                        <div class="col">
+                            <select id="inputState" class="form-control" name="division">
+                                {% for row in division %}
+                                    <option value={{ row['area'] }}>{{ row['area'] }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
-                        <div class="col-12 col-md-3">
-                            <div class="dropdown">
-                                <button type="submit" class="btn btn-lg btn-info dropdown-toggle"
-                                        data-toggle="dropdown"
-                                        aria-haspopup="true" aria-expanded="false">Search
-                                </button>
-                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                    <a class="dropdown-item" href="#">Action</a>
-                                    <a class="dropdown-item" href="#">Another action</a>
-                                    <a class="dropdown-item" href="#">Something else here</a>
-                                </div>
-                            </div>
+                        <div class="col">
+                            <select id="inputState" class="form-control" name="category">
+                                <option value="all">All</option>
+                                {% for row in category %}
+                                    <option value={{ row['category'] }}>{{ row.category }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col">
+                            <select id="inputState" class="form-control" name="month">
+                                <option value="all">All</option>
+                                {% for row in month %}
+                                    <option value={{ row['month'] }}>{{ row.month }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col">
+                            <button type="submit" class="btn btn-info mb-2">Search</button>
                         </div>
                     </div>
                 </form>

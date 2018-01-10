@@ -12,31 +12,34 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
           integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
           crossorigin=""/>
+
+ 
   <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
   integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
   crossorigin="">
   </script>
+
     <title>Munchy Gourmet</title>
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-light {# transparent #}  navbar-dark bg-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">Munchy Gourmet</a>
+        <a class="navbar-brand" href="{{ url_for('home') }}">Munchy Gourmet</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
                 aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarResponsive">
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home
-                        <span class="sr-only">(current)</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">About</a>
-                </li>
+{#                <li class="nav-item active">#}
+{#                    <a class="nav-link" href="#">Home#}
+{#                        <span class="sr-only">(current)</span>#}
+{#                    </a>#}
+{#                </li>#}
+{#                <li class="nav-item">#}
+{#                    <a class="nav-link" href="#">About</a>#}
+{#                </li>#}
                 {% if session.username %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
@@ -47,7 +50,7 @@
                     </li>
                 {% endif %} {% if not session.username %}
                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="modal" data-target="#myModal">Login</a>
+                    <a class="nav-link" {# data-toggle="modal" data-target="#myModal" #} href="{{ url_for('login') }}">Login</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('register') }}">Register</a>
@@ -57,7 +60,7 @@
         </div>
     </div>
 </nav>
-<div class="container-fluid">{% block content %}{% endblock %}</div>
+{% block content %}{% endblock %}
 
 {% include 'footer.html' %}
 
@@ -81,10 +84,10 @@
                 <div class="input-group mb-3">
                     <input type="password" class="form-control" placeholder="Password">
                 </div>
-                <div class="form-check">
-                    <input type="checkbox" class="form-check-input" id="exampleCheck1">
-                    <label class="form-check-label" for="exampleCheck1">Remember me</label>
-                </div>
+{#                <div class="form-check">#}
+{#                    <input type="checkbox" class="form-check-input" id="exampleCheck1">#}
+{#                    <label class="form-check-label" for="exampleCheck1">Remember me</label>#}
+{#                </div>#}
                 <button type="submit" class="btn btn-secondary">Login Me In</button>
             </div>
 
