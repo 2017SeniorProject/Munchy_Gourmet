@@ -3,56 +3,38 @@
 {% block content %}
     {% include "head.html" %}
     <div class="container">
-        {#        <!-- Page Content -->#}
-        {#        <section class="py-5">#}
-        {#            <div class="container">#}
-        {#                <div>#}
-        {##}
-        {#                    <button onclick="getLocation()">Geolocation Demo</button>#}
-        {#                    <p id="demo"></p>#}
-        {#                </div>#}
-        {#            </div>#}
-        {#        </section>#}
-
-
-        {#        <h1>General Search:</h1>#}
-        {##}
-        {#        <div>#}
-        {#            <form action="{{ url_for('show') }}" method="post">#}
-        {#                <br>#}
-        {#                Area:#}
-        {#                <select name="division">#}
-        {#                    {% for row in division %}#}
-        {#                        <option value={{ row['area'] }}>{{ row['area'] }}</option>#}
-        {#                    {% endfor %}#}
-        {#                </select>#}
-        {##}
-        {#                <br>#}
-        {#                <br>#}
-        {#                Category:#}
-        {#                <select name="category">#}
-        {#                    <option value="all">all</option>#}
-        {#                    {% for row in category %}#}
-        {#                        <option value={{ row['category'] }}>{{ row.category }}</option>#}
-        {#                    {% endfor %}#}
-        {#                </select>#}
-        {##}
-        {#                <br>#}
-        {#                <br>#}
-        {#                Month:#}
-        {#                <select name="month">#}
-        {#                    <option value="all">all</option>#}
-        {#                    {% for row in month %}#}
-        {#                        <option value={{ row['month'] }}>{{ row.month }}</option>#}
-        {#                    {% endfor %}#}
-        {#                </select>#}
-        {##}
-        {#                <br>#}
-        {#                <input type="submit" value="submit">#}
-        {#            </form>#}
-        {#        </div>#}
+{#        <h1>General Search:</h1>#}
+{##}
+{#        <div>#}
+{#            <form action="{{ url_for('show') }}" method="post">#}
+{#                Category:#}
+{#                <select name="category">#}
+{#                    <option value="all">all</option>#}
+{#                    {% for row in category %}#}
+{#                        <option value={{ row['category'] }}>{{ row.category }}</option>#}
+{#                    {% endfor %}#}
+{#                </select>#}
+{##}
+{#                <br>#}
+{#                <br>#}
+{#                Month:#}
+{#                <select name="month">#}
+{#                    <option value="all">all</option>#}
+{#                    {% for number in range(12) %}#}
+{#                        <option value={{ number }}>{{ number }}</option>#}
+{#                    {% endfor %}#}
+{#                </select>#}
+{##}
+{#                <br>#}
+{#                <input type="submit" value="submit">#}
+{#            </form>#}
+{#        </div>#}
         {##########################################################################################}
         {% if session.username %}
+            <br>
+            <br>
+            <br>
+
             <div class="col-12">
             <div class="row">
                 <h1> Near You </h1>
