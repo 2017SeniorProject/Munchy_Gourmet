@@ -210,7 +210,8 @@ def show():
         if len(recommendation) > 0:
             session['item'] = recommendation[0]['reco']
         # reco=RecoEngine.more2(location,category,month,user)
-        return render_template("show_reco.html", recommendation=recommendation)
+        return render_template("show_reco.html", recommendation=recommendation, location=location, category=category,
+                               month=month)
 
     season = rec.currentSeason()
     category = rec.getCategory()

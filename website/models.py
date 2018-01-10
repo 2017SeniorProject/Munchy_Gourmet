@@ -378,7 +378,7 @@ class RecoEngine:
         query = """match(n:Restaurant{shopId:{idd}}),
 		path=(n)-[r:NEIGHBOR*1..2]-(reco) 
 		with reduce(cost=0,r in rels(path)|cost+r.cost) as totalWeight,path,(n),(reco)
-		return distinct reco, totalWeight order by totalWeight limit 5"""
+		return distinct reco, totalWeight order by totalWeight limit 8"""
 
         return graph.run(query, idd=idd)
 

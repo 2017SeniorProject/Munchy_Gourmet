@@ -1,45 +1,75 @@
 {% extends "layout.html" %}
-
 {% block content %}
-		<h1>Shop: {{detail[0]['reco']['shopName']}}</h1>
+    <header class="masthead2">
+        <div class=""></div>
+        <div class="container">
+            <div class="row">
+                <div class="col mx-auto">
+                    <div class="card" style="width: 18rem;">
+                        <div class="card-body">
+                            <h2 class="card-title">{{ detail[0]['reco']['shopName'] }}</h2>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ detail[0]['reco']['SDAddress'] }}</h6>
+                            <h6 class="card-subtitle mb-2 text-muted">{{ detail[0]['reco']['SDTelephone'] }}</h6>
+                            <div class='starrr'></div>
+                            <h6 class="card-subtitle mb-2 text-muted">Price:{{ detail[0]['reco']['price'] }}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        {#        <h1>{{ detail[0]['reco']['shopName'] }}</h1>#}
+        {##}
+        {#        <div>#}
+        {#            <p>#}
+        {#                name:{{ detail[0]['reco']['shopName'] }}<br>#}
+        {#                add:{{ detail[0]['reco']['SDAddress'] }},<br>#}
+        {#                lat:{{ detail[0]['reco']['latitude'] }},<br>#}
+        {#                lon:{{ detail[0]['reco']['longitude'] }}<br>#}
+        {#                SDRate:{{ detail[0]['reco']['SDRate'] }}<br>#}
+        {#                category:{{ detail[0]['SDCategory'] }}<br>#}
+        {#                price:{{ detail[0]['reco']['price'] }}<br>#}
+        {#                telephone:{{ detail[0]['reco']['SDTelephone'] }}<br>#}
+        {#                reviewCount:{{ detail[0]['reco']['reviewCount'] }}<br>#}
+        {#            </p>#}
+        {##}
+        {#        </div>#}
 
-		<div> 
-					<p>
-					name:{{ detail[0]['reco']['shopName'] }}<br>
-					add:{{ detail[0]['reco']['SDAddress']}},<br>
-					lat:{{ detail[0]['reco']['latitude'] }},<br>
-					lon:{{ detail[0]['reco']['longitude'] }}<br>
-					SDRate:{{ detail[0]['reco']['SDRate']}}<br>
-					category:{{ detail[0]['SDCategory']}}<br>
-					price:{{ detail[0]['reco']['price']}}<br>
-					telephone:{{detail[0]['reco']['SDTelephone']}}<br>
-					reviewCount:{{detail[0]['reco']['reviewCount']}}<br>
-					 </p> 
-
-		 </div>
-
-		 <div>
-		 	<h1> Review Link </h1>
-		 	{% for row in reviews %}
-		 	<p> http://www.ipeen.com.tw/comment/{{row['review']['reviewId']}}</p>
-		 	{% endfor%}
-		 </div>
-
-		<div>
-			<h1> You might like:</h1>
-				{% for row in relating %}
-					<p>
-					name:{{ row['reco']['shopName'] }},
-					add:{{ row['reco']['SDAddress']}},
-					lat:{{ row['reco']['latitude'] }},
-					lon:{{ row['reco']['longitude'] }},
-					SDRate:{{ row['reco'['SDRate']] }}
-					cat:{{ row['SDCategory']}},
-					distance:{{ row['distance'] }}
-					<a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">detail</a>
-					 </p> 
-				{% endfor %}
+        <div>
+            <h1> Review Link </h1>
+            {% for row in reviews %}
+                <p><a href="http://www.ipeen.com.tw/comment/{{ row['review']['reviewId'] }}">http://www.ipeen.com.tw/comment/{{ row['review']['reviewId'] }}</a>
+                </p>
+                {#                <p> http://www.ipeen.com.tw/comment/{{ row['review']['reviewId'] }}</p>#}
+            {% endfor %}
+        </div>
 
 
-		</div>
+        <h1> You might like:</h1>
+        <div class="card-deck">
+            {% for row in relating %}
+                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
+                    <div class="card border-light">
+                        <img src="http://via.placeholder.com/220x150">
+                        {#                            <img class="card-img-top"#}
+                        {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
+                        {#                                 alt="Card image cap" width="100px" height="100px">#}
+                        <div class="card-body">
+                            <h6 class="card-title">{{ row['reco']['shopName'] }}</h6>
+                            {#                                <p>{{ row['reco'['SDRate']] }}</p>#}
+                            {#                                <p>{{ row['cat'] }}</p>#}
+                            {#                                <p>{{ row['reco']['price'] }}</p>#}
+                            {#                                <p class="card-text"></p>#}
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+    <script>
+        $('.starrr').starrr({
+            rating: {{ detail[0]['reco']['SDRate'] /10 }}
+        })
+    </script>
 {% endblock %}
