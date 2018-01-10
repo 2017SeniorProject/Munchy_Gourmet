@@ -380,7 +380,15 @@ class RecoEngine:
 		with reduce(cost=0,r in rels(path)|cost+r.cost) as totalWeight,path,(n),(reco)
 		return distinct reco, totalWeight order by totalWeight limit 5"""
 
-		return graph.run(query,idd=idd)
+		result=graph.data(query,idd=idd)
+		return result
+		if result==[]:
+			query1=""" Match (n:Restaurant)-[:IN_CATEGORY]->(c:Category),(reco)-[:IN_CATEGORY]->(c) where reco.shopId={idd} and (n)<>(reco)
+				return reco order by reco.SDRate limit 5
+			"""
+			return graph.data(query1,idd=idd)
+		else:
+			return result
 
 	def more2(location,category,month,user1):
 		user=user1.find()
@@ -495,10 +503,10 @@ class RecoEngine:
 			season="Winter"
 
 		query="""
-		Match (s:Season)-[:IN_SEASON]-(m:Month)-[:MONTH_TOP]-(reco:Restaurant) where s.season={season}
-		return distinct reco order by reco.reviewCount desc limit 7
+		Match (m:Month)-[:MONTH_TOP]-(reco:Restaurant)-[rel:BY_MONTH]-(m) where m.month={month}
+		return reco order by rel.m_avg desc limit 7
 		"""
-		return graph.data(query,season=season)
+		return graph.data(query,month=month)
 
 	def topRes(division):
 		location=division
