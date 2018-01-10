@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import request, session, render_template
+from flask import request, session, render_template, redirect, url_for
 from flask_debugtoolbar import DebugToolbarExtension
 
 from .models import RecoEngine, User
@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.secret_key = "super secret key"
 
 # the toolbar is only enabled in debug mode:
-app.debug = True
+app.debug = False
 
 # set a 'SECRET_KEY' to enable the Flask session cookies
 app.config['SECRET_KEY'] = 'salt'
@@ -52,7 +52,8 @@ def register():
         else:
             session['username'] = username
             User(session['username']).setLocation()
-            return render_template("notice.html", message='register sucessfully')
+            # return render_template("notice.html", message='register sucessfully')
+            return redirect(url_for('home'))
 
     return render_template('register.html')
 
@@ -68,7 +69,8 @@ def login():
         else:
             session['username'] = username
             User(session['username']).setLocation()
-            return render_template("notice.html", message='Logged in.')
+            # return render_template("notice.html", message='Logged in.')
+            return redirect(url_for('home'))
 
     return render_template('login.html')
 
@@ -76,7 +78,7 @@ def login():
 @app.route('/logout')
 def logout():
     session.pop('username', None)
-    return render_template("notice.html", message='Log out.')
+    return redirect(url_for('home'))
 
 
 @app.route("/near_you", methods=["GET", "POST"])
