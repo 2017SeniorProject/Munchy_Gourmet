@@ -19,24 +19,10 @@
         </div>
     </header>
     <div class="container">
-        {#        <h1>{{ detail[0]['reco']['shopName'] }}</h1>#}
-        {##}
-        {#        <div>#}
-        {#            <p>#}
-        {#                name:{{ detail[0]['reco']['shopName'] }}<br>#}
-        {#                add:{{ detail[0]['reco']['SDAddress'] }},<br>#}
-        {#                lat:{{ detail[0]['reco']['latitude'] }},<br>#}
-        {#                lon:{{ detail[0]['reco']['longitude'] }}<br>#}
-        {#                SDRate:{{ detail[0]['reco']['SDRate'] }}<br>#}
-        {#                category:{{ detail[0]['SDCategory'] }}<br>#}
-        {#                price:{{ detail[0]['reco']['price'] }}<br>#}
-        {#                telephone:{{ detail[0]['reco']['SDTelephone'] }}<br>#}
-        {#                reviewCount:{{ detail[0]['reco']['reviewCount'] }}<br>#}
-        {#            </p>#}
-        {##}
-        {#        </div>#}
 
-        <div>
+        <div class="col">
+            <br>
+            <br>
             <h1> Review Link </h1>
             {% for row in reviews %}
                 <p><a href="http://www.ipeen.com.tw/comment/{{ row['review']['reviewId'] }}">http://www.ipeen.com.tw/comment/{{ row['review']['reviewId'] }}</a>
@@ -44,27 +30,24 @@
                 {#                <p> http://www.ipeen.com.tw/comment/{{ row['review']['reviewId'] }}</p>#}
             {% endfor %}
         </div>
+        <div class="col">
+            <br>
+            <br>
+            <h1> You might also like</h1>
+            <div class="card-deck">
+                {% for row in relating %}
+                    <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
+                        <div class="card border-light">
+                            <img src="http://lorempixel.com/220/150/food/{{ range(1, 10) | random }}/">
+                            {#                            <img src="http://via.placeholder.com/220x150">#}
+                            <div class="card-body">
+                                <h6 class="card-title">{{ row['reco']['shopName'] }}</h6>
 
-
-        <h1> You might like:</h1>
-        <div class="card-deck">
-            {% for row in relating %}
-                <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
-                    <div class="card border-light">
-                        <img src="http://via.placeholder.com/220x150">
-                        {#                            <img class="card-img-top"#}
-                        {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
-                        {#                                 alt="Card image cap" width="100px" height="100px">#}
-                        <div class="card-body">
-                            <h6 class="card-title">{{ row['reco']['shopName'] }}</h6>
-                            {#                                <p>{{ row['reco'['SDRate']] }}</p>#}
-                            {#                                <p>{{ row['cat'] }}</p>#}
-                            {#                                <p>{{ row['reco']['price'] }}</p>#}
-                            {#                                <p class="card-text"></p>#}
+                            </div>
                         </div>
-                    </div>
-                </a>
-            {% endfor %}
+                    </a>
+                {% endfor %}
+            </div>
         </div>
     </div>
     <script>

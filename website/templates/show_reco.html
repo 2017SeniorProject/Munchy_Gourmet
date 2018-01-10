@@ -45,7 +45,8 @@
             {% for row in recommendation %}
                 <a href="{{ url_for('res_detail', shopId=row['reco']['shopId']) }}">
                     <div class="card border-light">
-                        <img src="http://via.placeholder.com/220x150">
+                        <img src="http://lorempixel.com/220/150/food/{{ range(1, 10) | random }}/">
+{#                        <img src="http://via.placeholder.com/220x150">#}
                         {#                            <img class="card-img-top"#}
                         {#                                 src="{{ url_for('static', filename='img/restaurant-512.png') }}"#}
                         {#                                 alt="Card image cap" width="100px" height="100px">#}
