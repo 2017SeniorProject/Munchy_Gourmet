@@ -224,11 +224,11 @@ def show():
         toucheng = rec.topResToucheng()
         dongshan = rec.topResDongshan()
         nearyou = rec.res_near_you()
-        return render_template("show.html", season=season, category=category, month=month, division=division, jiaoxi=jiaoxi,
+        return render_template("index.html", season=season, category=category, month=month, division=division, jiaoxi=jiaoxi,
                                popular=topPlace, yilan=yilan, loudong=loudong, toucheng=toucheng, dongshan=dongshan,
                                nearyou=nearyou)
     else:
-        return "todo"
+        return render_template("notification.html")
 
 
 @app.route("/", methods=["GET", "POST"])
