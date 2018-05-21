@@ -201,7 +201,7 @@ def just_for_you():
 @app.route("/show", methods=["GET", "POST"])
 def show():
     rec = RecoEngine()
-    if request.method == "POST":
+    if request.method == "POST" and session.get('username') is not None:
         location = request.form["division"]
         category = request.form["category"]
         month = request.form["month"]
@@ -212,21 +212,23 @@ def show():
         # reco=RecoEngine.more2(location,category,month,user)
         return render_template("show_reco.html", recommendation=recommendation, location=location, category=category,
                                month=month)
-
-    season = rec.currentSeason()
-    category = rec.getCategory()
-    month = rec.getMonth()
-    division = rec.getDivision()
-    topPlace = rec.topPlace()
-    jiaoxi = rec.topResJiaoxi()
-    yilan = rec.topRes("宜蘭市")
-    loudong = rec.topRes("羅東鎮")
-    toucheng = rec.topResToucheng()
-    dongshan = rec.topResDongshan()
-    nearyou = rec.res_near_you()
-    return render_template("show.html", season=season, category=category, month=month, division=division, jiaoxi=jiaoxi,
-                           popular=topPlace, yilan=yilan, loudong=loudong, toucheng=toucheng, dongshan=dongshan,
-                           nearyou=nearyou)
+    elif request.method=="GET":
+        season = rec.currentSeason()
+        category = rec.getCategory()
+        month = rec.getMonth()
+        division = rec.getDivision()
+        topPlace = rec.topPlace()
+        jiaoxi = rec.topResJiaoxi()
+        yilan = rec.topRes("宜蘭市")
+        loudong = rec.topRes("羅東鎮")
+        toucheng = rec.topResToucheng()
+        dongshan = rec.topResDongshan()
+        nearyou = rec.res_near_you()
+        return render_template("show.html", season=season, category=category, month=month, division=division, jiaoxi=jiaoxi,
+                               popular=topPlace, yilan=yilan, loudong=loudong, toucheng=toucheng, dongshan=dongshan,
+                               nearyou=nearyou)
+    else:
+        return "todo"
 
 
 @app.route("/", methods=["GET", "POST"])
