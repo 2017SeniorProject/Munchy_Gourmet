@@ -198,37 +198,37 @@ def just_for_you():
 
 
 ######################################################################################################################################################
-@app.route("/show", methods=["GET", "POST"])
-def show():
-    rec = RecoEngine()
-    if request.method == "POST" and session.get('username') is not None:
-        location = request.form["division"]
-        category = request.form["category"]
-        month = request.form["month"]
-        user = User(session['username'])
-        recommendation = rec.more2(location, category, month, user)
-        if len(recommendation) > 0:
-            session['item'] = recommendation[0]['reco']
-        # reco=RecoEngine.more2(location,category,month,user)
-        return render_template("show_reco.html", recommendation=recommendation, location=location, category=category,
-                               month=month)
-    elif request.method=="GET":
-        season = rec.currentSeason()
-        category = rec.getCategory()
-        month = rec.getMonth()
-        division = rec.getDivision()
-        topPlace = rec.topPlace()
-        jiaoxi = rec.topResJiaoxi()
-        yilan = rec.topRes("宜蘭市")
-        loudong = rec.topRes("羅東鎮")
-        toucheng = rec.topResToucheng()
-        dongshan = rec.topResDongshan()
-        nearyou = rec.res_near_you()
-        return render_template("index.html", season=season, category=category, month=month, division=division, jiaoxi=jiaoxi,
-                               popular=topPlace, yilan=yilan, loudong=loudong, toucheng=toucheng, dongshan=dongshan,
-                               nearyou=nearyou)
-    else:
-        return render_template("notification.html")
+# @app.route("/show", methods=["GET", "POST"])
+# def show():
+#     rec = RecoEngine()
+#     if request.method == "POST" and session.get('username') is not None:
+#         location = request.form["division"]
+#         category = request.form["category"]
+#         month = request.form["month"]
+#         user = User(session['username'])
+#         recommendation = rec.more2(location, category, month, user)
+#         if len(recommendation) > 0:
+#             session['item'] = recommendation[0]['reco']
+#         # reco=RecoEngine.more2(location,category,month,user)
+#         return render_template("show_reco.html", recommendation=recommendation, location=location, category=category,
+#                                month=month)
+#     elif request.method=="GET":
+#         season = rec.currentSeason()
+#         category = rec.getCategory()
+#         month = rec.getMonth()
+#         division = rec.getDivision()
+#         topPlace = rec.topPlace()
+#         jiaoxi = rec.topResJiaoxi()
+#         yilan = rec.topRes("宜蘭市")
+#         loudong = rec.topRes("羅東鎮")
+#         toucheng = rec.topResToucheng()
+#         dongshan = rec.topResDongshan()
+#         nearyou = rec.res_near_you()
+#         return render_template("index.html", season=season, category=category, month=month, division=division, jiaoxi=jiaoxi,
+#                                popular=topPlace, yilan=yilan, loudong=loudong, toucheng=toucheng, dongshan=dongshan,
+#                                nearyou=nearyou)
+#     else:
+#         return render_template("notification.html")
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -270,3 +270,42 @@ def res_detail(shopId):
     reviews = rec.getReviews(shopId)
     relating = rec.relating(shopId)
     return render_template("res_detail.html", relating=relating, detail=detail, reviews=reviews)
+###################################################################################################################MAY22,2018#####
+@app.route("/show_reco/<location>/<category>/<month>",methods=["GET"])
+def showreco(location,category,month):
+    rec = RecoEngine()
+    session['location']=location
+    session['category']=category
+    session['month']=month
+    user = User(session['username'])
+    recommendation = rec.more2(location, category, month, user)
+    if len(recommendation) > 0:
+        session['item'] = recommendation[0]['reco']
+    return render_template("show_reco.html", recommendation=recommendation, location=session['location'], category=session['category'],
+                               month=session['month'])
+
+@app.route("/show", methods=["GET", "POST"])
+def show():
+    rec = RecoEngine()
+    if request.method == "POST" and session.get('username') is not None:
+        location = request.form["division"]
+        category = request.form["category"]
+        month = request.form["month"]
+        return redirect(url_for('showreco', location=location,category=category,month=month))
+    elif request.method=="GET":
+        season = rec.currentSeason()
+        category = rec.getCategory()
+        month = rec.getMonth()
+        division = rec.getDivision()
+        topPlace = rec.topPlace()
+        jiaoxi = rec.topResJiaoxi()
+        yilan = rec.topRes("宜蘭市")
+        loudong = rec.topRes("羅東鎮")
+        toucheng = rec.topResToucheng()
+        dongshan = rec.topResDongshan()
+        nearyou = rec.res_near_you()
+        return render_template("index.html", season=season, category=category, month=month, division=division, jiaoxi=jiaoxi,
+                               popular=topPlace, yilan=yilan, loudong=loudong, toucheng=toucheng, dongshan=dongshan,
+                               nearyou=nearyou)
+    else:
+        return render_template("notification.html")
