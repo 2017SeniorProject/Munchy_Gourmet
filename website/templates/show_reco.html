@@ -29,9 +29,10 @@
         {% for row in recommendation %}
 
             L.marker([{{ row['reco']['latitude'] }}, {{ row['reco']['longitude'] }}]).addTo(map)
-                .bindPopup("<strong>{{ row['reco']['shopName'] }}</strong>").openPopup();
+                .bindPopup("<strong>"+"<a href='{{ url_for('res_detail', shopId=row['reco']['shopId']) }}'>"+"{{ row['reco']['shopName'] }}"+"</strong>").openPopup();
 
         {% endfor %}
+
 
     </script>
     <div class="container">
